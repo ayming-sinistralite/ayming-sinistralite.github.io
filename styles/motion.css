@@ -1,0 +1,126 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Comportements d'interaction partagés par les DEUX pages. Les valeurs viennent
+   de tokens.css, chargé avant celui-ci.
+
+   Pourquoi ce fichier : l'app ne donnait AUCUN retour au clic, nulle part. Rien
+   ne bougeait quand on appuyait, ce qui est la raison principale pour laquelle
+   elle pouvait sembler inerte alors que plusieurs choses s'animent déjà.
+
+   Le retour est volontairement à la limite du perceptible : ces contrôles sont
+   utilisés des dizaines de fois par jour, et à cette fréquence une animation
+   visible finit par donner une impression de lenteur.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Contrôles pressables. Exclus volontairement : les surfaces de DONNÉES
+   (.map-caisse, .pos-dot), qu'on lit et qui ne doivent pas bouger pour le style,
+   et les lignes de tableau ou de liste (.ac-item, .comp-table tr,
+   .top-sector-row), déjà pourvues d'un survol et que la mise à l'échelle
+   déformerait sur toute la largeur. */
+#gateOverlay button,
+.action-btn,
+.bench-add-chip,
+.bench-chip-x,
+.bench-indirect,
+.bench-reset,
+.bench-reset-link,
+.bottom-nav-item,
+.breadcrumb a,
+.btn-ghost,
+.btn-primary,
+.cmp-add-btn,
+.comp-toggle button,
+.compare-chip .chip-remove,
+.level-tabs button,
+.nav-item,
+.ranking-sort-btn,
+.retry-btn,
+.share-drawer-header .close-btn,
+.share-option,
+.tap-panel-close,
+.theme-toggle,
+.va-chip,
+.va-h-open,
+.va-launch-btn,
+.va-teaser-x,
+.va-x,
+.year-pill {
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+#gateOverlay button:active,
+.action-btn:active,
+.bench-add-chip:active,
+.bench-chip-x:active,
+.bench-indirect:active,
+.bench-reset:active,
+.bench-reset-link:active,
+.bottom-nav-item:active,
+.breadcrumb a:active,
+.btn-ghost:active,
+.btn-primary:active,
+.cmp-add-btn:active,
+.comp-toggle button:active,
+.compare-chip .chip-remove:active,
+.level-tabs button:active,
+.nav-item:active,
+.ranking-sort-btn:active,
+.retry-btn:active,
+.share-drawer-header .close-btn:active,
+.share-option:active,
+.tap-panel-close:active,
+.theme-toggle:active,
+.va-chip:active,
+.va-h-open:active,
+.va-launch-btn:active,
+.va-teaser-x:active,
+.va-x:active,
+.year-pill:active {
+  transform: scale(0.97);
+}
+
+/* Mouvement réduit : on retire le déplacement, pas le retour. Un changement
+   d'état doit rester perceptible, c'est pourquoi on ne coupe pas tout. */
+@media (prefers-reduced-motion: reduce) {
+  #gateOverlay button,
+  .action-btn,
+  .bench-add-chip,
+  .bench-chip-x,
+  .bench-indirect,
+  .bench-reset,
+  .bench-reset-link,
+  .bottom-nav-item,
+  .breadcrumb a,
+  .btn-ghost,
+  .btn-primary,
+  .cmp-add-btn,
+  .comp-toggle button,
+  .compare-chip .chip-remove,
+  .level-tabs button,
+  .nav-item,
+  .ranking-sort-btn,
+  .retry-btn,
+  .share-drawer-header .close-btn,
+  .share-option,
+  .tap-panel-close,
+  .theme-toggle,
+  .va-chip,
+  .va-h-open,
+  .va-launch-btn,
+  .va-teaser-x,
+  .va-x,
+  .year-pill {
+    transition: none;
+  }
+
+  #gateOverlay button:active,
+  .action-btn:active,
+  .btn-ghost:active,
+  .btn-primary:active,
+  .level-tabs button:active,
+  .nav-item:active,
+  .va-chip:active,
+  .year-pill:active {
+    transform: none;
+    opacity: 0.75;
+  }
+}

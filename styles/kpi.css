@@ -1,0 +1,168 @@
+/* kpi.css */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    background: transparent;
+    margin-bottom: 40px;
+  }
+  .kpi-card {
+    background: var(--bg-elevated);
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--card-shadow);
+  }
+  .kpi-card .label {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .kpi-card .value {
+    font-family: var(--sans);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .kpi-card .label .kpi-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    cursor: help;
+    position: relative;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  .kpi-card .label .kpi-help:hover { color: var(--text-secondary); border-color: var(--text-dim); }
+  /* display:none plutôt qu'une simple opacité : une boîte absolue de 240 px ancrée sur
+     la dernière carte KPI déborde le viewport en tablette et crée un défilement
+     horizontal, invisible mais bien réel, même à opacité nulle. */
+  .kpi-card .label .kpi-help .kpi-help-tip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: -8px;
+    width: 240px;
+    max-width: calc(100vw - 32px);
+    background: var(--text);
+    color: var(--bg-elevated);
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.45;
+    padding: 10px 12px;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .kpi-card .label .kpi-help:hover .kpi-help-tip { display: block; }
+  .kpi-card .value[data-full] {
+    cursor: default;
+    position: relative;
+  }
+  .kpi-card .value[data-full]::after {
+    content: attr(data-full);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    background: var(--text);
+    color: var(--bg-elevated);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+  .kpi-card .value[data-full]:hover::after { opacity: 1; }
+  .kpi-card .badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 8px;
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    border-radius: 2px;
+  }
+  .badge.up { background: var(--danger-dim); color: var(--danger); }
+  .badge.down { background: var(--safe-dim); color: var(--safe); }
+  .badge.neutral { background: rgba(139,148,158,0.1); color: var(--text-secondary); }
+
+  /* Mode comparaison (style GA4) : segments côte à côte, chiffres aussi visibles.
+     La grille reste à 3 colonnes pour 2-3 segments (la taille des cartes change peu),
+     puis s'élargit à 2 colonnes seulement à partir de 4 segments. */
+  /* La largeur des cartes grandit avec le nombre de segments pour garder les
+     valeurs sur UNE seule ligne (style GA4) : 2 secteurs = 3 colonnes, 3-4 = 2
+     colonnes, 5 = pleine largeur. */
+  .kpi-grid.comparing { grid-template-columns: repeat(2, 1fr); }
+  .kpi-grid.comparing.seg-2 { grid-template-columns: repeat(3, 1fr); }
+  .kpi-grid.comparing.seg-3,
+  .kpi-grid.comparing.seg-4 { grid-template-columns: repeat(2, 1fr); }
+  .kpi-grid.comparing.seg-5 { grid-template-columns: 1fr; }
+  .kpi-grid.comparing .kpi-card { padding: 18px 20px; }
+  .kpi-card-compare .kpi-segments { justify-content: space-between; }
+  .kpi-card-compare .kpi-segments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    margin-top: 10px;
+  }
+  .kpi-seg {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 64px;
+  }
+  .kpi-seg-pill {
+    align-self: flex-start;
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--on-accent);
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .kpi-seg-pill.current { background: var(--accent); }
+  .kpi-seg-val {
+    font-family: var(--sans);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  @media (max-width: 900px) {
+    .kpi-grid.comparing,
+    .kpi-grid.comparing.seg-2,
+    .kpi-grid.comparing.seg-3,
+    .kpi-grid.comparing.seg-4,
+    .kpi-grid.comparing.seg-5 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .kpi-grid.comparing .kpi-card { padding: 16px; }
+  }
+
+  @media (max-width: 768px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .kpi-card .value { font-size: 1.5rem; }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    .kpi-card { padding: 16px; }
+    .kpi-card .value { font-size: 1.3rem; }
+    .kpi-card .label { font-size: var(--text-xs); }
+  }

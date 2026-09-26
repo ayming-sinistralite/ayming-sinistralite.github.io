@@ -1,0 +1,348 @@
+/* ── Mon entreprise : autodiagnostic, habillé aux couleurs Ayming ──
+   Charte : ~/projects/ayming/DESIGN.md. Surfaces blanches et aérées, bleu #00AEEF comme
+   seul accent, titres bleu nuit #004A76, dégradé bleu vers vert réservé aux temps forts,
+   Lato jusqu'à 700. L'en-tête commun des vues est masqué, la page porte son propre titre. */
+
+body[data-view="compare"] .container > header { display: none; }
+
+#view-compare {
+  --ay-blue: #00AEEF;
+  --ay-blue-soft: rgba(0, 174, 239, 0.10);
+  --ay-blue-wash: #F4FBFF;
+  --ay-navy: #004A76;
+  --ay-mid: #0072B6;
+  --ay-red: #DC533A;
+  --ay-green-text: #068367;
+  --ay-grad: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%);
+  --ay-grad-dark: linear-gradient(160deg, #004A76 0%, #278FC9 60%, #00AEEF 100%);
+  --ay-border: #eef2f6;
+  --ay-panel: #f8fafc;
+  --ay-heading: var(--ay-navy);
+  --ay-body: #4A5B68;
+  --ay-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --ay-shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.10);
+  --bench-up: var(--ay-red);
+  --bench-up-bg: rgba(220, 83, 58, 0.10);
+  --bench-down: var(--ay-green-text);
+  --bench-down-bg: rgba(0, 176, 139, 0.10);
+  text-align: left;
+  color: var(--ay-body);
+}
+[data-theme="dark"] #view-compare {
+  --ay-heading: var(--text);
+  --ay-body: var(--text-secondary);
+  --ay-blue-wash: color-mix(in srgb, #00AEEF 6%, var(--bg));
+  --ay-border: var(--border);
+  --ay-panel: var(--bg-card);
+  --ay-shadow-md: none;
+  --ay-shadow-lg: none;
+  --ay-green-text: #3fb98f;
+  --ay-red: #e7775f;
+}
+/* Les blocs affichés en flex doivent quand même céder à l'attribut hidden. */
+#view-compare [hidden] { display: none !important; }
+
+/* Mot en dégradé dans un titre, comme dans le guide de marque */
+.bench-grad-text {
+  background: var(--ay-grad); -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+/* Pastille de section : dégradé, libellé blanc en petites capitales */
+.bench-chip-brand {
+  display: inline-block; margin-bottom: var(--space-4); padding: 6px 14px; border-radius: 30px;
+  background: var(--ay-grad); color: #fff;
+  font-size: 0.6875rem; font-weight: var(--weight-bold); letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+/* ── 1. Le calculateur ── */
+.bench-hero {
+  padding-top: var(--space-16); padding-bottom: var(--space-20);
+  background: linear-gradient(180deg, var(--ay-blue-wash) 0%, var(--band-white) 100%);
+  border-bottom: 1px solid var(--border-light);
+}
+.bench-hero-head { max-width: 780px; margin: 0 auto var(--space-10); text-align: center; }
+.bench-hero-title {
+  margin: 0 0 var(--space-4); font-size: 2.5rem; font-weight: var(--weight-bold);
+  line-height: 1.15; color: var(--ay-heading);
+}
+.bench-hero-sub { margin: 0; font-size: 1.0625rem; line-height: 1.6; color: var(--ay-body); }
+
+.bench-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.bench-form,
+.bench-result {
+  background: var(--bg-card);
+  border: 1px solid var(--ay-border);
+  border-radius: 16px;
+  box-shadow: var(--ay-shadow-md);
+}
+.bench-form { padding: var(--space-6); }
+.bench-result { padding: var(--space-8); }
+
+/* Étapes du formulaire */
+.bench-steps {
+  display: flex; gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0 0 var(--space-4);
+  list-style: none; border-bottom: 1px solid var(--ay-border);
+}
+.bench-step {
+  display: flex; align-items: center; gap: var(--space-2); flex: 1;
+  font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--text-dim);
+}
+.bench-step-num {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--ay-panel); border: 1px solid var(--ay-border); color: var(--text-dim);
+  font-size: var(--text-xs);
+}
+.bench-step.active { color: var(--ay-heading); }
+.bench-step.active .bench-step-num { background: var(--ay-grad); border-color: transparent; color: #fff; }
+.bench-step.done { color: var(--ay-heading); }
+.bench-step.done .bench-step-num { background: var(--ay-blue-soft); border-color: transparent; color: var(--ay-mid); }
+
+.bench-pane-title { margin: 0 0 var(--space-1); font-size: 1.125rem; font-weight: var(--weight-bold); color: var(--ay-heading); }
+.bench-pane-sub { margin: 0 0 var(--space-5); font-size: var(--text-sm); color: var(--ay-body); }
+
+.bench-label { display: block; margin-bottom: var(--space-2); font-size: var(--text-sm); font-weight: 600; color: var(--ay-heading); }
+.bench-sector { margin-bottom: var(--space-4); }
+.bench-search { width: 100%; border-color: #d5dde5; border-radius: 8px; box-shadow: none; }
+[data-theme="dark"] .bench-search { border-color: var(--border); }
+.bench-search:focus-within { border-color: var(--ay-blue); box-shadow: 0 0 0 3px var(--ay-blue-soft); }
+.bench-search input { min-height: var(--tap-min); padding: 0 var(--space-3); font-family: var(--sans); font-size: var(--text-base); }
+.bench-note { margin: var(--space-2) 0 0; font-size: var(--text-xs); line-height: 1.4; color: var(--text-dim); text-align: center; }
+.ac-hint { padding: 12px 14px; font-size: var(--text-sm); color: var(--text-dim); line-height: 1.5; }
+
+.bench-sector-chip:empty { display: none; }
+.bench-chip {
+  display: inline-flex; align-items: center; gap: var(--space-2); max-width: 100%;
+  padding: 6px 8px 6px 12px; border-radius: 30px;
+  background: var(--ay-blue-soft); font-size: var(--text-sm);
+}
+.bench-chip-code { font-weight: var(--weight-bold); color: var(--ay-heading); }
+.bench-chip-lib { color: var(--ay-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bench-chip-x {
+  flex-shrink: 0; width: 22px; height: 22px; border: none; border-radius: 50%; cursor: pointer;
+  background: var(--bg-card); color: var(--text-dim); font-size: 1rem; line-height: 1;
+}
+.bench-chip-x:hover { background: var(--ay-blue); color: #fff; }
+
+.bench-fields { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+.bench-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.bench-field label { font-size: var(--text-sm); font-weight: 600; color: var(--ay-heading); line-height: 1.3; }
+.bench-field input,
+.bench-field select {
+  width: 100%; box-sizing: border-box; min-height: var(--tap-min); padding: 0 var(--space-3);
+  border: 1px solid #d5dde5; border-radius: 8px;
+  background: var(--bg-card); color: var(--text);
+  font-family: var(--sans); font-size: var(--text-base); font-variant-numeric: tabular-nums;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+[data-theme="dark"] .bench-field input,
+[data-theme="dark"] .bench-field select { border-color: var(--border); background: var(--bg-elevated); }
+.bench-field input::placeholder { color: var(--text-dim); }
+.bench-field input:focus,
+.bench-field select:focus { outline: none; border-color: var(--ay-blue); box-shadow: 0 0 0 3px var(--ay-blue-soft); }
+.bench-field-hint { font-size: var(--text-xs); color: var(--text-dim); line-height: 1.3; }
+.bench-field-wide { grid-column: 1 / -1; }
+.bench-report-fields { grid-template-columns: 1fr 1fr; align-items: end; }
+
+.bench-reset-link,
+.bench-inline-link {
+  border: none; background: none; padding: 0; cursor: pointer;
+  font-family: var(--sans); font-size: var(--text-sm); color: var(--text-dim);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.bench-reset-link { display: block; margin: var(--space-5) auto 0; }
+.bench-reset-link:hover,
+.bench-inline-link:hover { color: var(--ay-blue); }
+
+.bench-report-carry {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3);
+  margin-bottom: var(--space-5); padding: var(--space-3) var(--space-4); border-radius: 12px;
+  background: var(--ay-blue-soft); font-size: var(--text-sm);
+}
+.bench-carry-k { font-weight: var(--weight-bold); color: var(--ay-heading); }
+.bench-carry-v { flex: 1 1 200px; color: var(--ay-body); }
+
+/* Bouton principal : pilule en dégradé, le temps fort de la page */
+.bench-primary-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 var(--space-6); border: none; border-radius: 30px;
+  background: var(--ay-grad); color: #fff; cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-size: var(--text-base); font-weight: var(--weight-bold);
+  box-shadow: var(--ay-shadow-md);
+  transition: box-shadow 0.15s, transform var(--dur-press) var(--ease-out), opacity 0.15s;
+}
+.bench-primary-btn:hover { box-shadow: var(--ay-shadow-lg); }
+.bench-primary-btn:active { transform: scale(0.97); }
+.bench-primary-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+#bench-step2 .bench-primary-btn { width: 100%; margin-top: var(--space-6); }
+
+/* Carte résultat : un grand chiffre, une liste de lignes, un pied */
+.bench-result-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-2); }
+.bench-result-head h3 { margin: 0; font-size: 1.125rem; font-weight: var(--weight-bold); color: var(--ay-heading); }
+.bench-result-sector { font-size: var(--text-sm); color: var(--ay-body); min-width: 0; overflow-wrap: anywhere; }
+
+.bench-big { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin-bottom: var(--space-5); }
+.bench-big-num {
+  font-size: 4rem; font-weight: 300; line-height: 1;
+  color: var(--ay-heading); font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+}
+.bench-big-cap { flex: 1 1 180px; font-size: 0.8125rem; color: var(--ay-body); line-height: 1.3; }
+.bench-big.is-empty .bench-big-num { color: var(--text-dim); }
+
+.bench-badge {
+  display: inline-block; padding: 4px 12px; border-radius: 30px; white-space: nowrap;
+  font-size: var(--text-xs); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums;
+}
+.bench-badge.above { background: var(--bench-up-bg); color: var(--bench-up); }
+.bench-badge.below { background: var(--bench-down-bg); color: var(--bench-down); }
+.bench-badge.neutral { background: var(--ay-panel); color: var(--ay-body); }
+
+.bench-lines { display: flex; flex-direction: column; }
+.bench-line {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3);
+  padding: 11px 0; border-bottom: 1px solid var(--ay-border); font-size: 0.9375rem;
+}
+.bench-line:last-child { border-bottom: none; }
+.bench-line-label { color: var(--ay-body); }
+.bench-line-val { font-weight: var(--weight-bold); color: var(--ay-heading); text-align: right; font-variant-numeric: tabular-nums; }
+.bench-line.is-muted .bench-line-val { font-weight: var(--weight-normal); color: var(--text-dim); font-size: var(--text-sm); }
+.bench-line.is-gain .bench-line-label { color: var(--ay-heading); font-weight: var(--weight-bold); }
+.bench-line.is-gain .bench-line-val { color: var(--bench-up); }
+.bench-line.is-ahead .bench-line-val { color: var(--bench-down); }
+
+.bench-footnote { margin: var(--space-3) 0 0; font-size: var(--text-xs); color: var(--text-dim); line-height: 1.5; }
+
+.bench-result-foot { margin-top: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--ay-border); }
+.bench-result-cta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+.bench-result-cta p { margin: 0; color: var(--ay-heading); line-height: 1.4; }
+/* Résultat prêt : le pied devient un encart teinté et le bouton appelle le clic */
+.bench-result-cta.is-ready {
+  margin-top: var(--space-5); padding: var(--space-5); border: 1px solid rgba(0, 174, 239, 0.35);
+  border-radius: 16px; background: var(--ay-blue-soft);
+}
+.bench-result-cta.is-ready p { font-size: 1.05rem; }
+.bench-result-cta.is-ready .bench-primary-btn {
+  min-height: 54px; padding: 0 var(--space-8); font-size: 1.1rem; gap: var(--space-2);
+  box-shadow: 0 6px 20px rgba(0, 174, 239, 0.35); animation: bench-cta-pulse 2.4s ease-out 0.6s infinite;
+}
+.bench-result-cta.is-ready .bench-primary-btn:hover { box-shadow: 0 10px 30px rgba(0, 174, 239, 0.45); animation: none; }
+.bench-btn-arrow { display: inline-block; transition: transform 0.2s var(--ease-out); }
+.bench-primary-btn:hover .bench-btn-arrow { transform: translateX(4px); }
+.bench-result-cta.is-arriving { animation: bench-cta-in 0.45s var(--ease-out); }
+@keyframes bench-cta-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes bench-cta-pulse {
+  0% { box-shadow: 0 6px 20px rgba(0, 174, 239, 0.35), 0 0 0 0 rgba(0, 174, 239, 0.45); }
+  70%, 100% { box-shadow: 0 6px 20px rgba(0, 174, 239, 0.35), 0 0 0 14px rgba(0, 174, 239, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bench-result-cta.is-arriving, .bench-result-cta.is-ready .bench-primary-btn { animation: none; }
+}
+.bench-foot-title { margin: 0 0 var(--space-3); font-size: 0.6875rem; font-weight: var(--weight-bold); letter-spacing: 0.5px; text-transform: uppercase; color: var(--ay-mid); }
+.bench-report-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); text-align: left; }
+.bench-report-list li { display: flex; gap: var(--space-3); align-items: flex-start; font-size: var(--text-sm); color: var(--ay-body); line-height: 1.4; }
+
+/* Pastille d'icône : cercle bleu doux, icône bleue (composant de la charte) */
+.bench-report-list svg,
+.bench-factors-list svg {
+  flex-shrink: 0; width: 22px; height: 22px; padding: 4px; box-sizing: border-box;
+  border-radius: 50%; background: var(--ay-blue-soft); color: var(--ay-blue);
+}
+
+/* ── 2. Ce qui compose l'autodiagnostic ── */
+.bench-section-title { margin: 0 0 var(--space-3); font-size: 1.875rem; font-weight: var(--weight-bold); color: var(--ay-heading); line-height: 1.2; }
+.bench-explain > .bench-section-title,
+.bench-explain > .bench-section-sub,
+.bench-faq > .bench-section-title { text-align: center; }
+.bench-section-sub { max-width: 760px; margin: 0 auto var(--space-10); color: var(--ay-body); line-height: 1.6; }
+.bench-explain-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-6); }
+.bench-explain-grid article {
+  padding: var(--space-6); border-radius: 16px; background: var(--bg-card);
+  border: 1px solid var(--ay-border); border-top: 3px solid var(--ay-blue);
+}
+.bench-explain-grid h4 { margin: 0 0 var(--space-2); font-size: 1rem; font-weight: var(--weight-bold); color: var(--ay-heading); }
+.bench-explain-grid p { margin: 0; font-size: var(--text-sm); color: var(--ay-body); line-height: 1.55; }
+
+/* ── 3. Les autres leviers ── */
+.bench-factors {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-10);
+}
+.bench-factors-intro p { margin: 0 0 var(--space-5); color: var(--ay-body); line-height: 1.6; }
+.bench-arrow-link { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: var(--weight-bold); color: var(--ay-blue); text-decoration: none; }
+.bench-arrow-link:hover { text-decoration: underline; }
+.bench-arrow-link svg { width: 18px; height: 18px; }
+.bench-factors-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); text-align: left; }
+.bench-factors-list li { display: flex; gap: var(--space-3); align-items: flex-start; color: var(--ay-body); line-height: 1.45; }
+.bench-factors-list a { display: inline-block; margin-left: 4px; font-weight: var(--weight-bold); color: var(--ay-mid); text-decoration: none; white-space: nowrap; }
+[data-theme="dark"] .bench-factors-list a { color: var(--ay-blue); }
+.bench-factors-list a:hover { text-decoration: underline; }
+
+/* ── 4. FAQ ── */
+.bench-faq { --page-w: 820px; }
+.bench-faq > .bench-section-title { margin-bottom: var(--space-6); }
+.bench-faq details { border-bottom: 1px solid var(--ay-border); }
+.bench-faq summary {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--space-4);
+  min-height: var(--tap-min); padding: var(--space-4) 0; cursor: pointer; list-style: none;
+  font-weight: var(--weight-bold); color: var(--ay-heading);
+}
+.bench-faq summary::-webkit-details-marker { display: none; }
+.bench-faq summary::after {
+  content: ''; flex-shrink: 0; width: 8px; height: 8px; margin-right: 4px;
+  border-right: 2px solid var(--ay-blue); border-bottom: 2px solid var(--ay-blue);
+  transform: rotate(45deg); transition: transform var(--dur-pop) var(--ease-out);
+}
+.bench-faq details[open] summary::after { transform: rotate(-135deg); }
+.bench-faq details p { margin: 0 0 var(--space-4); color: var(--ay-body); line-height: 1.6; }
+
+/* ── 5. Appel à un consultant : dégradé bleu nuit du guide ── */
+.bench-cta {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-8);
+  color: #fff; background: var(--ay-grad-dark);
+}
+.bench-cta h3 { margin: 0 0 var(--space-2); font-size: 1.5rem; font-weight: var(--weight-bold); color: #fff; }
+.bench-cta p { margin: 0; max-width: 620px; color: rgba(255,255,255,0.9); line-height: 1.6; }
+.bench-cta-btn {
+  flex-shrink: 0; display: inline-flex; align-items: center; min-height: 48px; padding: 0 var(--space-6);
+  border-radius: 30px; background: #fff; color: var(--ay-navy);
+  font-weight: var(--weight-bold); text-decoration: none; white-space: nowrap;
+  transition: box-shadow 0.15s, transform var(--dur-press) var(--ease-out);
+}
+.bench-cta-btn:hover { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18); }
+
+/* ── Tablette et mobile ── */
+@media (max-width: 1024px) {
+  .bench-hero-grid { grid-template-columns: 1fr; }
+  .bench-explain-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bench-factors { grid-template-columns: 1fr; gap: var(--space-6); }
+}
+@media (max-width: 640px) {
+  .bench-hero { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+  .bench-hero-title { font-size: 1.75rem; }
+  .bench-form, .bench-result { padding: var(--space-5) var(--space-4); }
+  .bench-big-num { font-size: 3rem; }
+  .bench-result-cta { flex-direction: column; align-items: stretch; }
+  .bench-report-fields { grid-template-columns: 1fr; }
+  .bench-explain-grid { grid-template-columns: 1fr; }
+  .bench-cta { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── Bouton « Comparer mon entreprise » de la barre du haut ── */
+.top-cta {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  height: 36px; padding: 0 var(--space-4); border: none; border-radius: 30px;
+  background: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%); color: #fff; cursor: pointer;
+  font-family: var(--sans); font-size: var(--text-sm); font-weight: var(--weight-bold);
+  transition: transform var(--dur-press) var(--ease-out), box-shadow 0.15s;
+}
+.top-cta:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
+.top-cta:active { transform: scale(0.97); }
+.top-cta svg { width: 16px; height: 16px; }
+body[data-view="compare"] .top-cta { display: none; }
+/* Sur mobile, la barre du bas porte déjà « Entreprise ». */
+@media (max-width: 768px) { .top-cta { display: none; } }

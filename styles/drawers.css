@@ -1,0 +1,95 @@
+/* drawers.css, tiroir « Partager » (l'analyse est passée dans l'assistant, voir assistant.css) */
+  .share-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 360px;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    z-index: 200;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--dropdown-shadow);
+  }
+  .share-drawer.open { transform: translateX(0); }
+  .share-drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .share-drawer-header .drawer-icon {
+    color: var(--accent);
+    display: flex;
+  }
+  .share-drawer-header .drawer-icon svg { width: 18px; height: 18px; }
+  .share-drawer-header h3 {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+  .share-drawer-header .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.15s, transform var(--dur-press) var(--ease-out);
+  }
+  .share-drawer-header .close-btn:hover { color: var(--text); }
+  .share-drawer-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .share-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s, transform var(--dur-press) var(--ease-out);
+    width: 100%;
+    font-family: var(--sans);
+  }
+  .share-option:hover { background: var(--bg-elevated); }
+  .share-option-icon { font-size: 1.1rem; color: var(--text-dim); width: 28px; text-align: center; }
+  .share-option-label { flex: 1; text-align: left; font-size: 0.88rem; }
+  .share-option-arrow { color: var(--text-dim); font-size: 1.1rem; }
+
+  .notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    display: none;
+  }
+  .notif-badge.visible { display: block; }
+
+  @media (max-width: 768px) {
+    .share-drawer { width: 100%; }
+  }

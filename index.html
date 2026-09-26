@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<!-- Page autonome par conception, elle embarque son style et son script inline.
+     script-src doit donc tolérer 'unsafe-inline'. Le contenu est entièrement
+     statique et n'affiche aucune donnée dynamique, la surface XSS est nulle.
+     Les autres directives (connect-src, object-src, base-uri) restent strictes. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Sinistralité AT/MP | Autodiagnostic gratuit par Ayming</title>
+<meta name="description" content="Comparez vos accidents du travail à votre secteur, estimez votre cotisation AT/MP et recevez un diagnostic de sinistralité personnalisé.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20x='5'%20y='18'%20width='6'%20height='9'%20rx='1.5'%20fill='%2300AEEF'/%3E%3Crect%20x='13'%20y='11'%20width='6'%20height='16'%20rx='1.5'%20fill='%23004A76'/%3E%3Crect%20x='21'%20y='5'%20width='6'%20height='22'%20rx='1.5'%20fill='%2300B08B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/motion.css">
+<script defer src="js/icons.js"></script>
+<script>
+  // Thème appliqué avant le premier rendu, sinon la page clignote en clair.
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('sinistralite-theme'); } catch (e) {}
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+  // Provenance de la visite (UTM, identifiants de clic), relue par le formulaire du diagnostic
+  // dans app.html. Même règle et même clé que captureAttribution() dans js/lead.js.
+  (function () {
+    var MAP = { utm_source: 'ga_source', utm_medium: 'ga_medium', utm_campaign: 'ga_campaign',
+      utm_content: 'ga_content', utm_term: 'ga_term', gclid: 'gclid', gbraid: 'gbraid',
+      wbraid: 'wbraid', msclkid: 'msclkid', fbclid: 'fbclid', li_fat_id: 'li_fat_id' };
+    var params = new URLSearchParams(window.location.search), found = {}, any = false;
+    Object.keys(MAP).forEach(function (k) {
+      var v = params.get(k);
+      if (v) { found[MAP[k]] = v.slice(0, 255); any = true; }
+    });
+    if (any) { try { localStorage.setItem('sinistralite-attribution', JSON.stringify(found)); } catch (e) {} }
+  })();
+</script>
+<style>
+  /* Trame StoryBrand (le modèle est la landing du StoryBrand Marketing Report) :
+     promesse et rapport en relief, problème, ce que fait le diagnostic, trois étapes,
+     bonus, enjeu, appel final. Couleurs, échelle et mouvement viennent de tokens.css. */
+  :root {
+    --page-w: 1160px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.10);
+    --dur-reveal: 700ms;
+    --hero-bg: #004a76;
+    --hero-bg-2: #003a5e;
+  }
+  [data-theme="dark"] {
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+    --hero-bg: #05121c;
+    --hero-bg-2: #0a1f30;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body {
+    margin: 0; background: var(--band-white); color: var(--text);
+    font-family: var(--sans); font-size: var(--text-base); line-height: var(--leading-normal);
+    font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  ul, ol, li { text-align: left; }
+  .wrap { max-width: var(--page-w); margin: 0 auto; padding: 0 var(--space-6); }
+  .band { position: relative; padding: var(--space-20) 0; }
+  .band-tint { background: var(--band-tint); }
+  .band-grey { background: var(--band-grey); }
+  .grad-text {
+    background: var(--brand-grad); -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+
+  /* ── Barre de progression de lecture, seul usage continu du dégradé. */
+  .progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60;
+    background: var(--brand-grad); transform-origin: 0 50%; transform: scaleX(0);
+  }
+
+  /* ── Navigation : le logo et l'action, rien d'autre (aucune sortie). */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--band-white) 86%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(12px); backdrop-filter: saturate(1.4) blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-panel) var(--ease-out), box-shadow var(--dur-panel) var(--ease-out);
+  }
+  .nav.scrolled { border-bottom-color: var(--border-light); box-shadow: var(--shadow-sm); }
+  .nav-inner { display: flex; align-items: center; gap: var(--space-6); height: 64px; }
+  .nav-logo { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; }
+  .nav-logo img { height: 28px; width: auto; }
+  [data-theme="dark"] .nav-logo img, [data-theme="dark"] .footer-logo { filter: brightness(0) invert(1); }
+  .nav-product {
+    padding-left: var(--space-3); border-left: 1px solid var(--border);
+    font-size: 0.9375rem; font-weight: var(--weight-bold); color: var(--heading);
+  }
+  .nav-actions { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
+  .theme-toggle {
+    width: var(--tap-min); height: var(--tap-min); display: grid; place-items: center;
+    border: none; background: none; color: var(--text-dim); border-radius: var(--radius-full);
+    cursor: pointer; transition: background var(--dur-pop) var(--ease-out), color var(--dur-pop) var(--ease-out);
+  }
+  .theme-toggle:hover { background: var(--accent-glow); color: var(--accent); }
+  .theme-toggle svg { width: 18px; height: 18px; }
+  .theme-toggle .i-sun { display: none; }
+  [data-theme="dark"] .theme-toggle .i-sun { display: block; }
+  [data-theme="dark"] .theme-toggle .i-moon { display: none; }
+
+  /* ── Boutons */
+  .btn-primary, .btn-ghost {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    min-height: var(--tap-min); padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-full); font-family: inherit; font-size: 0.9375rem;
+    font-weight: var(--weight-bold); text-decoration: none; cursor: pointer; white-space: nowrap;
+    transition: transform var(--dur-press) var(--ease-out), box-shadow var(--dur-panel) var(--ease-out),
+      background var(--dur-panel) var(--ease-out), color var(--dur-panel) var(--ease-out);
+  }
+  .btn-primary { color: #ffffff; background: var(--heading); border: none; box-shadow: var(--shadow-md); }
+  [data-theme="dark"] .btn-primary { background: var(--brand); color: #04121c; }
+  .btn-primary:hover { background: var(--accent); box-shadow: var(--shadow-lg); }
+  [data-theme="dark"] .btn-primary:hover { background: #44c8f5; }
+  .btn-brand { background: var(--brand); color: #04121c; }
+  .btn-brand:hover { background: #44c8f5; }
+  .btn-ghost { color: var(--heading); background: transparent; border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary svg, .btn-ghost svg, .link-arrow svg { width: 18px; height: 18px; transition: transform var(--dur-panel) var(--ease-out); }
+  .btn-primary:hover svg, .btn-ghost:hover svg, .link-arrow:hover svg { transform: translateX(3px); }
+  .btn-sm { min-height: 40px; padding: var(--space-2) var(--space-5); font-size: var(--text-sm); }
+  .btn-lg { padding: var(--space-4) var(--space-8); font-size: var(--text-base); }
+  .link-arrow {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: var(--space-5);
+    font-weight: var(--weight-bold); color: var(--accent); text-decoration: none;
+  }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: var(--space-3);
+  }
+  .eyebrow::before { content: ""; width: 20px; height: 2px; border-radius: 2px; background: var(--brand-grad); }
+  h1, h2, h3 { color: var(--heading); margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.75rem, 3.2vw, 2.5rem); line-height: var(--leading-tight); font-weight: var(--weight-bold); }
+  .section-head { max-width: 720px; margin-bottom: var(--space-12); }
+  .section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+  .section-head p, .lead { font-size: 1.0625rem; color: var(--text-secondary); margin: var(--space-4) 0 0; }
+
+  /* ── Champ de secteur : le premier geste du diagnostic, fait dès la landing. */
+  .start {
+    display: flex; align-items: center; gap: var(--space-2); max-width: 560px;
+    padding: 6px 6px 6px var(--space-5); background: #ffffff; border-radius: var(--radius-full);
+    box-shadow: var(--shadow-lg); border: 1px solid transparent;
+    transition: box-shadow var(--dur-panel) var(--ease-out), border-color var(--dur-panel) var(--ease-out);
+  }
+  .start:focus-within { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(0,174,239,0.25), var(--shadow-lg); }
+  .start > svg { width: 20px; height: 20px; color: #6b7280; flex-shrink: 0; }
+  .start input {
+    flex: 1; min-width: 0; border: none; background: none; outline: none; font-family: inherit;
+    font-size: var(--text-base); color: #0f172a; min-height: var(--tap-min);
+  }
+  .start input::placeholder { color: #6b7280; }
+  .start .btn-primary { background: #004a76; color: #ffffff; }
+  .start .btn-primary:hover { background: #0072b6; }
+  .start.on-light { border-color: var(--border); box-shadow: var(--shadow-md); }
+  [data-theme="dark"] .start.on-light { background: var(--bg-card); }
+  [data-theme="dark"] .start.on-light input { color: var(--text); }
+  [data-theme="dark"] .start .btn-primary { background: var(--brand); color: #04121c; }
+  .reassure { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); list-style: none; padding: 0; margin: var(--space-5) 0 0; }
+  .reassure li { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); }
+  .reassure svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── Hero : fond navy de la charte, le rapport en relief à droite. */
+  .hero {
+    position: relative; overflow: hidden; color: #ffffff;
+    background: linear-gradient(135deg, var(--hero-bg) 0%, var(--hero-bg-2) 100%);
+  }
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); align-items: center; min-height: 600px; padding: var(--space-16) 0; }
+  .chip {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: 6px 14px; border-radius: var(--radius-full); background: var(--brand-grad);
+    color: #ffffff; font-size: var(--text-xs); font-weight: var(--weight-bold);
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .hero h1 {
+    color: #ffffff; font-size: clamp(2.25rem, 4.6vw, 3.5rem); line-height: 1.08; font-weight: var(--weight-black);
+    margin: var(--space-5) 0; letter-spacing: -0.02em;
+  }
+  .hero h1 .grad-text { background: linear-gradient(90deg, #44c8f5, #3fd0aa); -webkit-background-clip: text; background-clip: text; }
+  .hero-sub { font-size: 1.1875rem; color: rgba(255,255,255,0.82); max-width: 520px; margin: 0 0 var(--space-8); }
+  .hero .reassure li { color: rgba(255,255,255,0.82); }
+  .hero .reassure svg { color: #3fd0aa; }
+
+  .enter { opacity: 0; transform: translateY(18px); animation: enter var(--dur-reveal) var(--ease-out) forwards; }
+  .enter:nth-child(1) { animation-delay: 80ms; }
+  .enter:nth-child(2) { animation-delay: 180ms; }
+  .enter:nth-child(3) { animation-delay: 280ms; }
+  .enter:nth-child(4) { animation-delay: 380ms; }
+  .enter:nth-child(5) { animation-delay: 480ms; }
+  @keyframes enter { to { opacity: 1; transform: none; } }
+
+  /* Le diagnostic en vue isométrique : quatre pages empilées qui s'écartent à l'arrivée,
+     flottent doucement et suivent la souris. Tout est en CSS, aucune image. */
+  .stack-scene { position: relative; height: 560px; padding-top: 70px; display: grid; place-items: center; }
+  .stack-float { animation: float 7s ease-in-out infinite; }
+  @keyframes float { 50% { transform: translateY(-12px); } }
+  .stack {
+    --gap: 0px; --rz: -36deg; --rx: 56deg;
+    position: relative; width: 270px; height: 360px; transform-style: preserve-3d;
+    transform: rotateX(var(--rx)) rotateZ(var(--rz));
+    transition: transform 600ms var(--ease-out);
+  }
+  .stack.open { --gap: 84px; }
+  .layer {
+    position: absolute; inset: 0; border-radius: 10px; overflow: hidden;
+    transform: translateZ(calc(var(--i) * var(--gap)));
+    transition: transform 1400ms var(--ease-out);
+    transition-delay: calc(var(--i) * 90ms);
+    box-shadow: -18px 22px 40px rgba(0,0,0,0.28);
+    background: #ffffff; color: #0f172a; padding: 22px;
+  }
+  .layer-shadow {
+    position: absolute; inset: 10px; border-radius: 12px; background: rgba(0,0,0,0.35);
+    filter: blur(22px); transform: translateZ(-40px);
+  }
+  .l-kicker { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0072b6; }
+  .l-title { font-size: 20px; line-height: 1.15; font-weight: 900; color: #004a76; margin: 6px 0 12px; }
+  .l-line { height: 7px; border-radius: 4px; background: #eef2f6; margin-bottom: 7px; }
+  .l-bar { height: 5px; border-radius: 3px; background: linear-gradient(90deg, #00aeef, #00b08b); margin-bottom: 16px; }
+  .l-big { font-size: 44px; font-weight: 900; line-height: 1; color: #004a76; margin-top: 14px; }
+  .l-cap { font-size: 10px; color: #6b7280; margin-top: 4px; }
+  .l-bars { display: grid; gap: 9px; margin-top: 18px; }
+  .l-bars i { display: block; height: 11px; border-radius: 6px; background: #a7bccb; }
+  .l-bars i:first-child { background: linear-gradient(90deg, #00aeef, #00b08b); }
+  .l-lever { display: flex; gap: 8px; align-items: center; padding: 9px 0; border-bottom: 1px solid #eef2f6; }
+  .l-lever b { width: 18px; height: 18px; flex-shrink: 0; border-radius: 50%; background: linear-gradient(90deg, #00aeef, #00b08b); color: #fff; font-size: 9px; display: grid; place-items: center; }
+  .l-lever span { height: 7px; flex: 1; border-radius: 4px; background: #eef2f6; }
+  .layer.navy { background: linear-gradient(160deg, #004a76, #00314f); color: #ffffff; }
+  .layer.navy .l-title { color: #ffffff; }
+  .l-ring { width: 120px; height: 120px; border-radius: 50%; border: 16px solid rgba(255,255,255,0.14); border-top-color: #00aeef; border-right-color: #00b08b; margin: 30px auto 0; }
+  .l-cover-band { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(160deg, #004a76, #00314f); padding: 18px 22px; color: #fff; }
+  .l-cover-band .l-big { color: #ffffff; font-size: 34px; margin-top: 0; }
+  .l-cover-band .l-cap { color: rgba(255,255,255,0.75); }
+  .l-code { display: inline-block; padding: 3px 8px; border-radius: 5px; background: #e6f7fd; color: #004a76; font-size: 10px; font-weight: 700; }
+
+  /* ── Apparition au défilement */
+  .reveal { opacity: 0; transform: translateY(24px);
+    transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out);
+    transition-delay: var(--d, 0ms); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ── Problème */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-16); align-items: center; }
+  .prose p { color: var(--text-secondary); font-size: 1.0625rem; margin: var(--space-4) 0 0; }
+  .prose p strong { color: var(--text); }
+  .prose .btn-primary { margin-top: var(--space-8); }
+  .trap { display: grid; gap: var(--space-4); }
+  .trap-card {
+    background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-6); box-shadow: var(--shadow-md);
+  }
+  .trap-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-3); }
+  .trap-top strong { color: var(--heading); }
+  .trap-verdict { font-size: var(--text-xs); font-weight: var(--weight-bold); padding: 3px 10px; border-radius: var(--radius-full); white-space: nowrap; }
+  .trap-verdict.good { color: var(--safe); background: color-mix(in srgb, var(--safe) 12%, transparent); }
+  .trap-verdict.bad { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+  .trap-rows { display: grid; gap: var(--space-2); }
+  .trap-row { display: grid; grid-template-columns: 110px 1fr 36px; gap: var(--space-2); align-items: center; font-size: var(--text-xs); color: var(--text-secondary); }
+  .trap-row b { text-align: right; color: var(--text); }
+  .track { height: 8px; border-radius: 8px; background: var(--border-light); overflow: hidden; }
+  .fill { height: 100%; border-radius: 8px; background: var(--c-8); transform-origin: 0 50%; transform: scaleX(0); transition: transform 1100ms var(--ease-out); }
+  .fill.you { background: var(--brand-grad); }
+  .in .fill { transform: scaleX(var(--w)); }
+  .in .trap-card:nth-child(2) .fill { transition-delay: 300ms; }
+  .trap-quote { margin: var(--space-2) 0 0; font-size: 1.0625rem; font-weight: var(--weight-bold); color: var(--heading); }
+
+  /* ── Ce que fait le diagnostic */
+  .does { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-8); list-style: none; margin: 0 0 var(--space-12); padding: 0; }
+  .does li { text-align: center; }
+  .does-icon { position: relative; width: 64px; height: 64px; margin: 0 auto var(--space-4); border-radius: 50%; display: grid; place-items: center; background: var(--accent-glow); color: var(--accent); }
+  .does-icon svg { width: 28px; height: 28px; }
+  .does-icon b {
+    position: absolute; top: -4px; right: -4px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--brand-grad); color: #ffffff; font-size: var(--text-xs); display: grid; place-items: center;
+    box-shadow: 0 0 0 3px var(--band-white);
+  }
+  .does p { margin: 0 auto; max-width: 280px; color: var(--text-secondary); }
+  .does p strong { color: var(--heading); }
+  .center { text-align: center; }
+
+  /* ── Étapes, en rangées alternées avec leur visuel */
+  .rows { display: grid; gap: var(--space-4); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-12); align-items: center; padding: var(--space-8) 0; }
+  .row.flip .row-visual { order: -1; }
+  .step-num {
+    width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; margin-bottom: var(--space-4);
+    background: var(--brand-grad); color: #ffffff; font-size: 1.25rem; font-weight: var(--weight-bold);
+    box-shadow: 0 0 0 5px var(--band-grey), var(--shadow-md);
+  }
+  .row h3 { font-size: var(--text-2xl); margin-bottom: var(--space-3); }
+  .row p { color: var(--text-secondary); margin: 0; max-width: 460px; }
+  .panel {
+    position: relative; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px;
+    box-shadow: var(--shadow-lg); padding: var(--space-6);
+  }
+  .panel::before { content: ""; position: absolute; left: 24px; right: 24px; top: -1px; height: 3px; border-radius: 0 0 3px 3px; background: var(--brand-grad); }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+  .panel-tag { font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
+  .replay {
+    display: inline-flex; align-items: center; min-height: 32px; padding: 0 var(--space-3);
+    border: 1px solid var(--border); border-radius: var(--radius-full); background: none;
+    font-family: inherit; font-size: var(--text-xs); font-weight: var(--weight-bold);
+    color: var(--text-secondary); cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity var(--dur-panel) var(--ease-out), color var(--dur-pop) var(--ease-out), border-color var(--dur-pop) var(--ease-out);
+  }
+  .replay.show { opacity: 1; pointer-events: auto; }
+  .replay:hover { color: var(--accent); border-color: var(--accent); }
+
+  .f-sector { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--band-tint); border-radius: var(--radius-md); margin-bottom: var(--space-3); }
+  .f-code { flex-shrink: 0; padding: 4px 10px; border-radius: var(--radius-sm); background: var(--heading); color: #ffffff; font-size: var(--text-xs); font-weight: var(--weight-bold); }
+  [data-theme="dark"] .f-code { background: var(--brand); color: #04121c; }
+  .f-sector span:last-child { font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--heading); }
+  .f-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+  .f-field { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); min-width: 0;
+    transition: border-color var(--dur-panel) var(--ease-out), box-shadow var(--dur-panel) var(--ease-out); }
+  .f-field.typing { border-color: var(--brand); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .f-field .lbl { display: block; font-size: var(--text-xs); color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .f-field output { display: block; min-height: 1.5em; font-weight: var(--weight-bold); color: var(--text); }
+  .f-field output::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -2px; background: var(--brand); opacity: 0; }
+  .f-field.typing output::after { opacity: 1; animation: caret 900ms steps(1) infinite; }
+  @keyframes caret { 50% { opacity: 0; } }
+
+  .r-top { display: grid; grid-template-columns: auto 1fr; gap: var(--space-6); align-items: center; }
+  .r-if { min-width: 132px; }
+  .r-label { font-size: var(--text-xs); color: var(--text-dim); }
+  .r-value { font-size: 3.25rem; line-height: 1; font-weight: var(--weight-black); color: var(--heading); margin: 6px 0; }
+  .r-gap {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);
+    font-size: var(--text-xs); font-weight: var(--weight-bold);
+    opacity: 0; transform: translateY(6px); transition: opacity var(--dur-panel) var(--ease-out), transform var(--dur-panel) var(--ease-out);
+  }
+  .r-gap svg { width: 14px; height: 14px; }
+  .r-gap.show { opacity: 1; transform: none; }
+  .bars { display: grid; gap: var(--space-2); }
+  .bar-row { display: grid; grid-template-columns: 100px 1fr 38px; gap: var(--space-2); align-items: center; font-size: var(--text-xs); color: var(--text-secondary); }
+  .bar-row b { color: var(--text); text-align: right; }
+  .bar-row.you { color: var(--heading); font-weight: var(--weight-bold); }
+  .bar-fill { height: 100%; border-radius: 8px; background: var(--c-8); transform-origin: 0 50%; transform: scaleX(0); transition: transform 1100ms var(--ease-out); }
+  .bar-row.you .bar-fill { background: var(--brand-grad); }
+  .money-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-5); }
+  .money {
+    padding: var(--space-4); border-radius: var(--radius-md); background: var(--band-grey); border: 1px solid var(--border-light);
+    opacity: 0; transform: translateY(10px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+  }
+  .money.show { opacity: 1; transform: none; }
+  .money small { display: block; font-size: var(--text-xs); color: var(--text-dim); }
+  .money strong { display: block; font-size: var(--text-2xl); line-height: 1.2; color: var(--heading); margin-top: 2px; }
+  .money.save { background: color-mix(in srgb, var(--safe) 8%, var(--bg-card)); border-color: color-mix(in srgb, var(--safe) 25%, transparent); }
+  .money.save strong { color: var(--safe); }
+  .note { font-size: var(--text-xs); color: var(--text-dim); margin: var(--space-3) 0 0; }
+
+  /* Pages du diagnostic, déployées en éventail. */
+  .pages { position: relative; height: 420px; }
+  .page {
+    position: absolute; top: 20px; left: 50%; width: 250px; height: 350px; margin-left: -125px;
+    background: #ffffff; border-radius: 10px; border: 1px solid #e3e9ef; box-shadow: var(--shadow-lg);
+    padding: 20px; overflow: hidden; color: #0f172a; transition: transform 1000ms var(--ease-out);
+  }
+  .pages.in .page-3 { transform: translateX(110px) translateY(18px) rotate(7deg); }
+  .pages.in .page-2 { transform: translateX(-110px) translateY(18px) rotate(-7deg); }
+  .pages.in .page-1 { transform: translateY(-6px); }
+
+  /* ── Bonus */
+  .bonus-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: var(--radius-full); background: var(--heading); color: #ffffff; font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: var(--space-4); }
+  [data-theme="dark"] .bonus-chip { background: var(--brand); color: #04121c; }
+  .bonus-chip svg { width: 14px; height: 14px; }
+  .search { display: flex; align-items: center; gap: var(--space-3); max-width: 640px; margin: 0 auto; padding: 6px 6px 6px var(--space-5);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-full); box-shadow: var(--shadow-md);
+    transition: border-color var(--dur-panel) var(--ease-out), box-shadow var(--dur-panel) var(--ease-out); }
+  .search:focus-within { border-color: var(--brand); box-shadow: 0 0 0 4px var(--accent-glow), var(--shadow-lg); }
+  .search > svg { width: 20px; height: 20px; color: var(--text-dim); flex-shrink: 0; }
+  .search input { flex: 1; min-width: 0; border: none; background: none; outline: none; font-family: inherit; font-size: var(--text-base); color: var(--text); min-height: var(--tap-min); }
+  .search input::placeholder { color: var(--text-dim); }
+  .popular { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); list-style: none; padding: 0; margin: var(--space-6) auto 0; max-width: 820px; }
+  .popular a { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: 0 var(--space-4);
+    border-radius: var(--radius-full); border: 1px solid var(--border); background: var(--bg-card);
+    font-size: var(--text-sm); color: var(--text-secondary); text-decoration: none;
+    transition: border-color var(--dur-pop) var(--ease-out), color var(--dur-pop) var(--ease-out), transform var(--dur-press) var(--ease-out); }
+  .popular a:hover { border-color: var(--accent); color: var(--accent); }
+  .popular a:active { transform: scale(0.97); }
+  .popular b { color: var(--heading); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-6); margin-top: var(--space-16); }
+  .stat { padding-left: var(--space-5); border-left: 2px solid var(--border); }
+  .stat-number { font-size: clamp(2.25rem, 4vw, 3rem); font-weight: 300; line-height: 1; color: var(--heading); }
+  .stat-label { margin-top: var(--space-2); font-size: var(--text-sm); color: var(--text-secondary); }
+
+  /* ── Enjeu et accompagnement */
+  .stakes { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-12); align-items: center; }
+  .levers { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+  .levers li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4);
+    background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md);
+    font-weight: var(--weight-bold); color: var(--heading); font-size: 0.9375rem; }
+  .levers li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand-grad); flex-shrink: 0; }
+  .levers-title { font-size: var(--text-xl); }
+  .memory { display: flex; gap: var(--space-2); margin-top: var(--space-8); }
+  .memory span { flex: 1; padding: var(--space-3); border-radius: var(--radius-md); background: var(--bg-card); border: 1px solid var(--border-light); text-align: center; font-size: var(--text-xs); color: var(--text-dim); }
+  .memory span b { display: block; font-size: var(--text-lg); color: var(--heading); }
+  .memory span.hit { border-color: color-mix(in srgb, var(--danger) 35%, transparent); background: color-mix(in srgb, var(--danger) 7%, var(--bg-card)); }
+  .memory span.hit b { color: var(--danger); }
+
+  /* ── Appel final */
+  .final { text-align: center; }
+  .final h2 { font-size: clamp(2rem, 4vw, 3rem); }
+  .final p { font-size: 1.125rem; color: var(--text-secondary); margin: var(--space-4) auto var(--space-8); max-width: 560px; }
+  .final .start { margin: 0 auto; }
+  .final .reassure { justify-content: center; }
+  .final .reassure li { color: var(--text-secondary); }
+  .final .reassure svg { color: var(--safe); }
+
+  footer { border-top: 1px solid var(--border-light); padding: var(--space-8) 0; font-size: var(--text-xs); color: var(--text-dim); }
+  .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); }
+  .footer-brand { display: flex; align-items: center; gap: var(--space-3); }
+  .footer-logo { height: 20px; width: auto; }
+  footer a { color: var(--text-secondary); }
+
+  /* ── Adaptations */
+  @media (max-width: 960px) {
+    .hero-grid, .split, .row, .stakes { grid-template-columns: 1fr; }
+    .hero-grid { min-height: 0; gap: 0; padding-bottom: 0; }
+    .row.flip .row-visual { order: 0; }
+    .row { gap: var(--space-8); }
+    .stack-scene { height: 440px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .band { padding: var(--space-16) 0; }
+    .wrap { padding-left: var(--space-4); padding-right: var(--space-4); }
+    .does { grid-template-columns: 1fr; gap: var(--space-8); }
+    .panel { padding: var(--space-4); }
+    .r-top { grid-template-columns: 1fr; gap: var(--space-4); }
+    .stack-scene { height: 380px; }
+    .stack { transform: rotateX(var(--rx)) rotateZ(var(--rz)) scale(0.8); }
+    .stack.open { --gap: 44px; }
+    .pages { height: 360px; transform: scale(0.8); transform-origin: 50% 0; margin-bottom: -60px; }
+    .pages.in .page-3 { transform: translateX(80px) translateY(14px) rotate(6deg); }
+    .pages.in .page-2 { transform: translateX(-80px) translateY(14px) rotate(-6deg); }
+    .nav-product { display: none; }
+    .start { padding-left: var(--space-4); }
+    .start .btn-primary { padding: var(--space-2) var(--space-4); }
+    .trap-row { grid-template-columns: 90px 1fr 36px; }
+  }
+  @media (max-width: 420px) {
+    .money-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+    .start .start-label { display: none; }
+  }
+
+  /* Mouvement réduit : tout est à sa place d'emblée, les démonstrations affichent leur état final. */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .enter, .reveal, .money, .r-gap { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .stack-float { animation: none !important; }
+    .fill, .bar-fill, .page, .layer, .stack { transition: none !important; }
+    .progress { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<nav class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="./" class="nav-logo" aria-label="Accueil, Ayming, sinistralité AT/MP">
+      <img src="assets/ayming-logo.png" alt="Ayming" width="70" height="28">
+      <span class="nav-product">Sinistralité AT/MP</span>
+    </a>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Changer le thème">
+        <i data-lucide="moon" class="i-moon"></i><i data-lucide="sun" class="i-sun"></i>
+      </button>
+      <a href="./app.html#compare" class="btn-primary btn-sm">Faire mon autodiagnostic</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="chip enter">Autodiagnostic AT/MP gratuit</span>
+      <h1 class="enter">Situez votre sinistralité face à <span class="grad-text">votre secteur</span></h1>
+      <p class="hero-sub enter">Quatre chiffres, et vous voyez tout de suite où vous vous situez face à votre métier et ce que vous coûtent vos accidents. Allez plus loin avec un diagnostic complet, et les leviers qui comptent pour votre entreprise.</p>
+      <form class="start enter" data-start role="search">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Votre métier ou code NAF" autocomplete="off" aria-label="Votre métier ou votre code NAF">
+        <button class="btn-primary" type="submit"><span class="start-label">Commencer</span><i data-lucide="arrow-right"></i></button>
+      </form>
+      <ul class="reassure enter">
+        <li><i data-lucide="gift"></i>Gratuit</li>
+        <li><i data-lucide="zap"></i>Résultat immédiat</li>
+        <li><i data-lucide="shield-check"></i>Données officielles</li>
+      </ul>
+    </div>
+
+    <div class="stack-scene" aria-hidden="true">
+      <div class="stack-float">
+        <div class="stack" id="stack">
+          <div class="layer-shadow"></div>
+          <div class="layer navy" style="--i:0">
+            <div class="l-kicker" style="color:#84d0f5">Votre cotisation</div>
+            <div class="l-title">Ce que votre risque vous coûte</div>
+            <div class="l-ring"></div>
+          </div>
+          <div class="layer" style="--i:1">
+            <div class="l-kicker">Vos leviers prioritaires</div>
+            <div class="l-title">Par où commencer</div>
+            <div class="l-lever"><b>1</b><span></span></div>
+            <div class="l-lever"><b>2</b><span></span></div>
+            <div class="l-lever"><b>3</b><span></span></div>
+            <div class="l-lever"><b>4</b><span></span></div>
+            <div class="l-lever"><b>5</b><span></span></div>
+          </div>
+          <div class="layer" style="--i:2">
+            <div class="l-kicker">Votre position</div>
+            <div class="l-title">Face à votre secteur</div>
+            <div class="l-big">75,0</div>
+            <div class="l-cap">accidents avec arrêt pour 1 000 salariés</div>
+            <div class="l-bars"><i style="width:100%"></i><i style="width:47%"></i><i style="width:43%"></i><i style="width:35%"></i></div>
+          </div>
+          <div class="layer" style="--i:3">
+            <div class="l-bar"></div>
+            <div class="l-kicker">Diagnostic comparatif</div>
+            <div class="l-title">Votre sinistralité AT/MP face à votre secteur</div>
+            <span class="l-code">4120A · Maisons individuelles</span>
+            <div class="l-line" style="margin-top:14px"></div>
+            <div class="l-line" style="width:80%"></div>
+            <div class="l-cover-band">
+              <div class="l-big">151 k€</div>
+              <div class="l-cap">cotisation AT/MP estimée par an</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LE PROBLÈME ===== -->
+<section class="band">
+  <div class="wrap split">
+    <div class="prose reveal">
+      <span class="eyebrow">Le constat</span>
+      <h2>La plupart des entreprises subissent leur sinistralité</h2>
+      <p>Vos accidents, vous les connaissez, dossier par dossier. Vos cotisations, vous les subissez, année après année. Ce qui manque, c'est de savoir si, <strong>comparé aux autres entreprises de votre métier</strong>, vous vous en sortez bien ou pas.</p>
+      <p>Sans cette réponse, chaque euro investi dans la prévention est un pari, et chaque hausse de cotisation une surprise.</p>
+      <a href="./app.html#compare" class="btn-primary btn-lg">Faire mon autodiagnostic <i data-lucide="arrow-right"></i></a>
+    </div>
+    <div class="trap reveal" style="--d: 150ms">
+      <div class="trap-card">
+        <div class="trap-top"><strong>Entreprise A</strong><span class="trap-verdict good">Mieux que ses pairs</span></div>
+        <div class="trap-rows">
+          <div class="trap-row"><span>Son indice</span><div class="track"><div class="fill you" style="--w:.8"></div></div><b>48</b></div>
+          <div class="trap-row"><span>Son secteur</span><div class="track"><div class="fill" style="--w:1"></div></div><b>60</b></div>
+        </div>
+      </div>
+      <div class="trap-card">
+        <div class="trap-top"><strong>Entreprise B</strong><span class="trap-verdict bad">Un problème qu'elle ne voit pas</span></div>
+        <div class="trap-rows">
+          <div class="trap-row"><span>Son indice</span><div class="track"><div class="fill you" style="--w:.33"></div></div><b>20</b></div>
+          <div class="trap-row"><span>Son secteur</span><div class="track"><div class="fill" style="--w:.2"></div></div><b>12</b></div>
+        </div>
+      </div>
+      <p class="trap-quote">Le chiffre brut rassure ou inquiète à tort. L'écart, lui, ne ment pas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CE QUE FAIT LE DIAGNOSTIC ===== -->
+<section class="band band-tint">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Votre diagnostic</span>
+      <h2>Ce que votre diagnostic fait pour vous</h2>
+    </div>
+    <ul class="does">
+      <li class="reveal"><div class="does-icon"><i data-lucide="users"></i><b>1</b></div>
+        <p><strong>Il révèle</strong> où vous vous situez face à votre secteur et aux établissements de votre taille.</p></li>
+      <li class="reveal" style="--d: 120ms"><div class="does-icon"><i data-lucide="bar-chart-3"></i><b>2</b></div>
+        <p><strong>Il chiffre</strong> votre cotisation AT/MP et l'écart avec la moyenne, en euros.</p></li>
+      <li class="reveal" style="--d: 240ms"><div class="does-icon"><i data-lucide="lightbulb"></i><b>3</b></div>
+        <p><strong>Il classe</strong> vos leviers prioritaires, pour savoir par où commencer.</p></li>
+    </ul>
+    <div class="center reveal"><a href="./app.html#compare" class="btn-primary btn-lg">Obtenir mon diagnostic <i data-lucide="arrow-right"></i></a></div>
+  </div>
+</section>
+
+<!-- ===== TROIS ÉTAPES ===== -->
+<section class="band band-grey">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Comment ça marche</span>
+      <h2>Trois étapes, deux minutes</h2>
+    </div>
+    <div class="rows">
+      <div class="row">
+        <div class="reveal">
+          <div class="step-num">1</div>
+          <h3>Renseignez quatre chiffres</h3>
+          <p>Votre activité, votre effectif, vos accidents avec arrêt sur l'année et votre masse salariale. Rien d'autre.</p>
+          <a href="./app.html#compare" class="link-arrow">Commencer maintenant <i data-lucide="arrow-right"></i></a>
+        </div>
+        <div class="row-visual reveal" style="--d: 120ms">
+          <div class="panel" id="demoForm">
+            <div class="panel-head"><span class="panel-tag">Vos chiffres</span></div>
+            <div class="f-sector"><span class="f-code">4120A</span><span>Construction de maisons individuelles</span></div>
+            <div class="f-grid">
+              <div class="f-field" data-value="120"><span class="lbl">Effectif salarié</span><output></output></div>
+              <div class="f-field" data-value="9"><span class="lbl">Accidents avec arrêt</span><output></output></div>
+              <div class="f-field" data-value="4 800 000 €" style="grid-column: span 2"><span class="lbl">Masse salariale annuelle</span><output></output></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row flip">
+        <div class="reveal">
+          <div class="step-num">2</div>
+          <h3>Découvrez votre position, tout de suite</h3>
+          <p>Votre fréquence d'accidents face à votre secteur, aux établissements de même taille et à la moyenne nationale, votre cotisation estimée et l'économie possible. Le résultat s'affiche à l'écran, gratuitement et sans inscription.</p>
+          <a href="./app.html#compare" class="link-arrow">Voir ma position <i data-lucide="arrow-right"></i></a>
+        </div>
+        <div class="row-visual reveal" style="--d: 120ms">
+          <div class="panel" id="demoResult">
+            <div class="panel-head"><span class="panel-tag">Exemple de résultat, 4120A</span><button class="replay" id="demoReplay" type="button">Rejouer</button></div>
+            <div class="r-top">
+              <div class="r-if">
+                <div class="r-label">Votre indice de fréquence</div>
+                <div class="r-value" id="demoIf">0,0</div>
+                <span class="r-gap" id="demoGap"><i data-lucide="trending-up"></i>+133 % vs secteur</span>
+              </div>
+              <div class="bars">
+                <div class="bar-row you"><span>Vous</span><div class="track"><div class="bar-fill" data-w="100"></div></div><b>75,0</b></div>
+                <div class="bar-row"><span>Même taille</span><div class="track"><div class="bar-fill" data-w="47.1"></div></div><b>35,3</b></div>
+                <div class="bar-row"><span>Votre secteur</span><div class="track"><div class="bar-fill" data-w="42.9"></div></div><b>32,2</b></div>
+                <div class="bar-row"><span>National</span><div class="track"><div class="bar-fill" data-w="35.2"></div></div><b>26,4</b></div>
+              </div>
+            </div>
+            <div class="money-grid">
+              <div class="money"><small>Cotisation AT/MP estimée</small><strong>151 k€ / an</strong></div>
+              <div class="money save"><small>Économie en revenant à la moyenne</small><strong>≈ 74 k€ / an</strong></div>
+            </div>
+            <p class="note">Accidents avec arrêt pour 1 000 salariés. Estimation indicative.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="reveal">
+          <div class="step-num">3</div>
+          <h3>Recevez votre diagnostic complet</h3>
+          <p>Quelques questions sur vos arrêts, vos maladies professionnelles et vos pratiques suffisent pour aller plus loin. Vous recevez votre diagnostic complet en PDF, avec votre comparatif détaillé face au secteur, ce qui pèse sur votre cotisation et les leviers prioritaires pour votre entreprise.</p>
+          <a href="./app.html#compare" class="link-arrow">Obtenir mon diagnostic complet <i data-lucide="arrow-right"></i></a>
+        </div>
+        <div class="row-visual">
+          <div class="pages" id="pages" aria-hidden="true">
+            <div class="page page-3">
+              <div class="l-kicker">Vos leviers prioritaires</div>
+              <div class="l-title">Par où commencer</div>
+              <div class="l-lever"><b>1</b><span></span></div>
+              <div class="l-lever"><b>2</b><span></span></div>
+              <div class="l-lever"><b>3</b><span></span></div>
+              <div class="l-lever"><b>4</b><span></span></div>
+            </div>
+            <div class="page page-2">
+              <div class="l-kicker">Où cibler la prévention</div>
+              <div class="l-title">Les causes dans votre activité</div>
+              <div class="l-ring" style="border-color:#eef2f6;border-top-color:#00aeef;border-right-color:#004a76;border-bottom-color:#00b08b;width:110px;height:110px;margin-top:22px"></div>
+            </div>
+            <div class="page page-1">
+              <div class="l-bar"></div>
+              <div class="l-kicker">Diagnostic comparatif</div>
+              <div class="l-title">Votre sinistralité AT/MP face à votre secteur</div>
+              <div class="l-line"></div>
+              <div class="l-line" style="width:85%"></div>
+              <div class="l-line" style="width:60%"></div>
+              <div class="l-big" style="font-size:30px;margin-top:26px">151 k€</div>
+              <div class="l-cap">cotisation AT/MP estimée par an</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BONUS ===== -->
+<section class="band" id="explorer">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="bonus-chip"><i data-lucide="sparkles"></i>Bonus</span>
+      <h2>Comparez aussi votre secteur à tous les autres</h2>
+      <p>En accès libre, la sinistralité de chaque activité, sur six ans, pour les accidents du travail, les maladies professionnelles et les accidents de trajet. Placez votre métier à côté des secteurs proches.</p>
+    </div>
+    <form class="search reveal" id="searchForm" role="search">
+      <i data-lucide="search"></i>
+      <input type="text" id="searchInput" placeholder="Ex. 4711D, restauration, transport" autocomplete="off" aria-label="Rechercher un code NAF ou un secteur">
+      <button class="btn-primary btn-sm" type="submit">Explorer</button>
+    </form>
+    <ul class="popular reveal" style="--d: 120ms">
+      <li><a href="./app.html#at/4120A"><b>4120A</b> Maisons individuelles</a></li>
+      <li><a href="./app.html#at/5610A"><b>5610A</b> Restauration traditionnelle</a></li>
+      <li><a href="./app.html#at/8810A"><b>8810A</b> Aide à domicile</a></li>
+      <li><a href="./app.html#at/4711D"><b>4711D</b> Supermarchés</a></li>
+      <li><a href="./app.html#at/4941A"><b>4941A</b> Transport routier de fret</a></li>
+      <li><a href="./app.html#at/8121Z"><b>8121Z</b> Nettoyage courant</a></li>
+    </ul>
+    <div class="stats">
+      <div class="stat reveal"><div class="stat-number" data-target="728">728</div><div class="stat-label">activités, par code NAF</div></div>
+      <div class="stat reveal" style="--d: 100ms"><div class="stat-number" data-target="3">3</div><div class="stat-label">risques, AT, MP et trajet</div></div>
+      <div class="stat reveal" style="--d: 200ms"><div class="stat-number" data-target="6">6</div><div class="stat-label">années, de 2019 à 2024</div></div>
+      <div class="stat reveal" style="--d: 300ms"><div class="stat-number" data-target="3">3</div><div class="stat-label">niveaux, du grand secteur à l'activité précise</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== L'ENJEU ===== -->
+<section class="band band-tint">
+  <div class="wrap stakes">
+    <div class="reveal">
+      <span class="eyebrow">L'enjeu</span>
+      <h2>Une cotisation ne se rattrape pas en un an</h2>
+      <p class="lead">Dès 20 salariés, quelques dossiers lourds sur un exercice pèsent sur votre taux pendant trois ans, bien après le retour des salariés concernés. La sinistralité ne se règle pas dossier par dossier, dans l'urgence. Elle se pilote dans la durée.</p>
+      <div class="memory" aria-label="Une année lourde pèse sur trois taux successifs">
+        <span><b>Une année</b>sinistres lourds</span>
+        <span class="hit"><b>1er taux</b>alourdi</span>
+        <span class="hit"><b>2e taux</b>alourdi</span>
+        <span class="hit"><b>3e taux</b>alourdi</span>
+      </div>
+    </div>
+    <div class="reveal" style="--d: 150ms">
+      <h3 class="levers-title">Des consultants Ayming pour passer à l'action</h3>
+      <ul class="levers">
+        <li>Maîtrise des cotisations AT/MP</li>
+        <li>Pilotage des arrêts de longue durée</li>
+        <li>Sécurisation des déclarations d'accident</li>
+        <li>Questionnaires de maladie professionnelle</li>
+        <li>Mise à jour du DUERP</li>
+        <li>Récupération des indemnités journalières</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== APPEL FINAL ===== -->
+<section class="band final">
+  <div class="wrap reveal">
+    <h2>Passez d'un poste subi à un <span class="grad-text">levier piloté</span></h2>
+    <p>Commencez par votre métier. Le diagnostic fait le reste.</p>
+    <form class="start on-light" data-start role="search">
+      <i data-lucide="search"></i>
+      <input type="text" placeholder="Votre métier ou code NAF" autocomplete="off" aria-label="Votre métier ou votre code NAF">
+      <button class="btn-primary" type="submit"><span class="start-label">Commencer</span><i data-lucide="arrow-right"></i></button>
+    </form>
+    <ul class="reassure">
+      <li><i data-lucide="gift"></i>Gratuit</li>
+        <li><i data-lucide="zap"></i>Résultat immédiat</li>
+      <li><i data-lucide="shield-check"></i>Données officielles</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <img class="footer-logo" src="assets/ayming-logo.png" alt="Ayming" width="50" height="20">
+      <span>Sinistralité AT/MP, un outil Ayming</span>
+    </div>
+    <span>Sources : Assurance Maladie, statistiques AT/MP 2024 (<a href="https://assurance-maladie.ameli.fr/etudes-et-donnees/risque-at-ctn-x-naf-serie-annuelle" target="_blank" rel="noopener">séries CTN × NAF</a>, <a href="https://assurance-maladie.ameli.fr/etudes-et-donnees/sinistralite-at-mp-par-code-naf" target="_blank" rel="noopener">fiches sectorielles</a>, <a href="https://data.ameli.fr/pages/data-risques-professionnels/" target="_blank" rel="noopener">open data</a>)</span>
+  </div>
+</footer>
+
+<script>
+  // Icônes et thème. icons.js est en defer, on attend donc DOMContentLoaded.
+  document.addEventListener('DOMContentLoaded', function () { lucide.createIcons(); });
+  document.getElementById('themeToggle').addEventListener('click', function () {
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    try { localStorage.setItem('sinistralite-theme', isDark ? 'light' : 'dark'); } catch (e) {}
+  });
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Le champ de secteur ouvre l'autodiagnostic déjà rempli (route #compare/<saisie> de l'app).
+  document.querySelectorAll('form[data-start]').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var q = form.querySelector('input').value.trim();
+      window.location.href = './app.html#compare' + (q ? '/' + encodeURIComponent(q) : '');
+    });
+  });
+  // Le bonus ouvre les vues sectorielles, comme l'ancienne recherche.
+  document.getElementById('searchForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var q = document.getElementById('searchInput').value.trim();
+    window.location.href = q ? './app.html#at/' + encodeURIComponent(q) : './app.html#at';
+  });
+
+  // Barre de lecture et ombre de la navigation.
+  var nav = document.getElementById('nav');
+  var progress = document.getElementById('progress');
+  var ticking = false;
+  function onScroll() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.transform = 'scaleX(' + (max > 0 ? window.scrollY / max : 0) + ')';
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  onScroll();
+
+  // Compteur animé, formaté à la française.
+  function fmt(v, d) { return v.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function countUp(el, to, decimals, duration) {
+    if (reduced) { el.textContent = fmt(to, decimals); return; }
+    var start = performance.now();
+    function tick(now) {
+      var p = Math.min((now - start) / duration, 1);
+      el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)), decimals);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // Apparition au défilement, une seule fois par élément. Le retard d'apparition est
+  // retiré ensuite, sinon il ralentirait aussi les survols.
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      el.classList.add('in');
+      setTimeout(function () { el.style.setProperty('--d', '0ms'); }, 1200);
+      var n = el.querySelector('.stat-number[data-target]');
+      if (n) countUp(n, parseInt(n.dataset.target, 10), 0, 1400);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal, #pages').forEach(function (el) { io.observe(el); });
+
+  // Le rapport en relief : les pages s'écartent à l'arrivée, puis suivent la souris.
+  var stack = document.getElementById('stack');
+  function openStack() { setTimeout(function () { stack.classList.add('open'); }, reduced ? 0 : 500); }
+  if (!reduced && window.matchMedia('(pointer: fine)').matches) {
+    var hero = document.querySelector('.hero');
+    hero.addEventListener('mousemove', function (e) {
+      var r = hero.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      stack.style.setProperty('--rz', (-36 + x * 10) + 'deg');
+      stack.style.setProperty('--rx', (56 - y * 8) + 'deg');
+      stack.style.setProperty('--gap', (84 + x * 16) + 'px');
+    });
+    hero.addEventListener('mouseleave', function () {
+      stack.style.removeProperty('--rz'); stack.style.removeProperty('--rx'); stack.style.removeProperty('--gap');
+    });
+  }
+
+  // La démonstration, sur les chiffres relevés dans l'outil pour 4120A, 120 salariés,
+  // 9 accidents et 4,8 M€ de masse salariale. L'étape 1 tape les chiffres, l'étape 2
+  // construit le résultat, chacune quand elle entre à l'écran.
+  var fields = Array.prototype.slice.call(document.querySelectorAll('.f-field'));
+  var bars = Array.prototype.slice.call(document.querySelectorAll('.bar-fill'));
+  var money = Array.prototype.slice.call(document.querySelectorAll('.money'));
+  var ifEl = document.getElementById('demoIf');
+  var gap = document.getElementById('demoGap');
+  var replay = document.getElementById('demoReplay');
+  var timers = [];
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+  function playForm() {
+    if (reduced) { fields.forEach(function (f) { f.querySelector('output').textContent = f.dataset.value; }); return; }
+    var t = 200;
+    fields.forEach(function (f) {
+      var out = f.querySelector('output');
+      var text = f.dataset.value;
+      out.textContent = '';
+      later(function () { f.classList.add('typing'); }, t);
+      for (var i = 1; i <= text.length; i++) {
+        (function (n) { later(function () { out.textContent = text.slice(0, n); }, t + 90 + n * 70); })(i);
+      }
+      t += 90 + text.length * 70 + 260;
+      later(function () { f.classList.remove('typing'); }, t - 120);
+    });
+  }
+  function resetResult() {
+    bars.forEach(function (b) { b.style.transition = 'none'; b.style.transform = 'scaleX(0)'; });
+    money.forEach(function (m) { m.classList.remove('show'); });
+    gap.classList.remove('show'); replay.classList.remove('show');
+    ifEl.textContent = '0,0';
+    void document.body.offsetWidth;
+  }
+  function playResult() {
+    resetResult();
+    if (reduced) {
+      bars.forEach(function (b) { b.style.transform = 'scaleX(' + (parseFloat(b.dataset.w) / 100) + ')'; });
+      money.forEach(function (m) { m.classList.add('show'); });
+      gap.classList.add('show'); ifEl.textContent = '75,0';
+      return;
+    }
+    countUp(ifEl, 75, 1, 1100);
+    bars.forEach(function (b, i) {
+      b.style.transition = '';
+      later(function () { b.style.transform = 'scaleX(' + (parseFloat(b.dataset.w) / 100) + ')'; }, i * 110);
+    });
+    later(function () { gap.classList.add('show'); }, 900);
+    later(function () { money[0].classList.add('show'); }, 1200);
+    later(function () { money[1].classList.add('show'); }, 1400);
+    later(function () { replay.classList.add('show'); }, 2000);
+  }
+  replay.addEventListener('click', playResult);
+
+  function whenSeen(el, fn) {
+    var o = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { o.disconnect(); setTimeout(fn, reduced ? 0 : 400); }
+    }, { threshold: 0.5 });
+    o.observe(el);
+  }
+
+  openStack();
+  whenSeen(document.getElementById('demoForm'), playForm);
+  whenSeen(document.getElementById('demoResult'), playResult);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,239 @@
+/* ── Diagnostic personnalisé : parcours et rapport ──
+   Vue plein écran sans le rail ni l'en-tête. Les écrans du parcours reprennent les
+   jetons Ayming de compare.css. Le rapport est une suite de pages A4 blanches, en clair
+   même en thème sombre puisqu'il s'imprime ; son impression produit le PDF. */
+
+body[data-view="diagnostic"] .container > header,
+body[data-view="diagnostic"] .nav-rail,
+body[data-view="diagnostic"] .bottom-nav,
+body[data-view="diagnostic"] .va-launcher,
+body[data-view="diagnostic"] .top-cta,
+body[data-view="diagnostic"] .container > footer { display: none !important; }
+/* Sans rail : pas de retrait à gauche, la gouttière de base.css suffit. */
+body[data-view="diagnostic"] .container { padding-left: 0; padding-top: calc(56px + var(--space-12)); }
+
+#view-diagnostic {
+  --ay-blue: #00AEEF;
+  --ay-blue-soft: rgba(0, 174, 239, 0.10);
+  --ay-navy: #004A76;
+  --ay-mid: #0072B6;
+  --ay-red: #DC533A;
+  --ay-grad: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%);
+  --ay-border: #eef2f6;
+  --ay-heading: var(--ay-navy);
+  --ay-body: #4A5B68;
+  --ay-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --ay-shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.10);
+  text-align: left;
+}
+[data-theme="dark"] #view-diagnostic {
+  --ay-heading: var(--text);
+  --ay-body: var(--text-secondary);
+  --ay-border: var(--border);
+  --ay-shadow-md: none;
+  --ay-shadow-lg: none;
+}
+#view-diagnostic [hidden] { display: none !important; }
+
+.diag-shell { max-width: 720px; margin: 0 auto; }
+
+/* Progression */
+.diag-progress { margin-bottom: var(--space-6); }
+.diag-progress-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--ay-heading); }
+.diag-progress-track { height: 6px; border-radius: 6px; background: var(--ay-border); overflow: hidden; }
+.diag-progress-track span { display: block; height: 100%; border-radius: 6px; background: var(--ay-grad); transition: width var(--dur-panel) var(--ease-out); }
+
+/* Écran */
+.diag-card {
+  padding: var(--space-10); border-radius: 20px; background: var(--bg-card);
+  border: 1px solid var(--ay-border); box-shadow: var(--ay-shadow-md);
+}
+.diag-center { text-align: center; }
+.diag-eyebrow { margin: 0 0 var(--space-2); font-size: 0.6875rem; font-weight: var(--weight-bold); letter-spacing: 0.5px; text-transform: uppercase; color: var(--ay-mid); }
+[data-theme="dark"] .diag-eyebrow { color: var(--ay-blue); }
+.diag-title { margin: 0 0 var(--space-3); font-size: 1.75rem; font-weight: var(--weight-bold); line-height: 1.2; color: var(--ay-heading); }
+.diag-lead { margin: 0 0 var(--space-6); color: var(--ay-body); line-height: 1.6; }
+.diag-center .diag-lead { max-width: 560px; margin-left: auto; margin-right: auto; }
+.diag-where { margin: var(--space-3) 0 0; font-size: var(--text-xs); color: var(--text-dim); }
+.diag-recap { margin: var(--space-6) 0 0; font-size: var(--text-sm); color: var(--text-dim); }
+
+.diag-kpis { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-4); margin: var(--space-6) 0; }
+.diag-kpi { display: flex; flex-direction: column; gap: 4px; min-width: 150px; padding: var(--space-4) var(--space-5); border-radius: 16px; background: var(--ay-blue-soft); }
+.diag-kpi-n { font-size: 2rem; font-weight: 300; color: var(--ay-heading); font-variant-numeric: tabular-nums; }
+.diag-kpi-l { font-size: 0.8125rem; color: var(--ay-body); }
+
+.diag-fields { grid-template-columns: 1fr 1fr; align-items: end; }
+.diag-fields-one { grid-template-columns: minmax(0, 320px); }
+
+/* Choix en pastilles */
+.diag-choice { margin-bottom: var(--space-5); }
+.diag-choice-label { margin: 0 0 var(--space-2); font-size: var(--text-sm); font-weight: 600; color: var(--ay-heading); }
+.diag-choice-label:empty { display: none; }
+.diag-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.diag-chip {
+  min-height: 40px; padding: 0 var(--space-5); border-radius: 30px; cursor: pointer;
+  border: 1px solid #d5dde5; background: var(--bg-card); color: var(--ay-heading);
+  font-family: var(--sans); font-size: var(--text-sm); font-weight: 600;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform var(--dur-press) var(--ease-out);
+}
+[data-theme="dark"] .diag-chip { border-color: var(--border); }
+.diag-chip:hover { border-color: var(--ay-blue); }
+.diag-chip:active { transform: scale(0.97); }
+.diag-chip.active { background: var(--ay-blue); border-color: var(--ay-blue); color: #fff; }
+.diag-fields + .diag-chip { margin-top: var(--space-3); }
+
+/* Éclairage en direct */
+.diag-insight {
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  margin-top: var(--space-6); padding: var(--space-4) var(--space-5); border-radius: 12px;
+  background: var(--ay-blue-soft); color: var(--ay-heading);
+}
+.diag-insight svg { flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px; color: var(--ay-blue); }
+.diag-insight p { margin: 0; line-height: 1.5; font-size: var(--text-sm); }
+.diag-insight p + p { margin-top: var(--space-2); }
+
+.diag-nav { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--ay-border); }
+.diag-link {
+  border: none; background: none; padding: 0; cursor: pointer; font-family: var(--sans);
+  font-size: var(--text-sm); color: var(--text-dim); text-decoration: underline; text-underline-offset: 2px;
+}
+.diag-link:hover { color: var(--ay-blue); }
+
+/* Coordonnées */
+.diag-consent { display: flex; gap: var(--space-3); align-items: flex-start; margin-top: var(--space-5); font-size: var(--text-sm); color: var(--ay-body); cursor: pointer; }
+.diag-consent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--ay-blue); }
+.diag-error { margin: var(--space-3) 0 0; font-size: var(--text-sm); font-weight: 600; color: var(--ay-red); }
+.diag-demo { margin: 0 0 var(--space-4); padding: var(--space-2) var(--space-3); border-radius: 8px; background: var(--ay-blue-soft); font-size: var(--text-sm); color: var(--ay-heading); }
+.diag-contents { margin-top: var(--space-6); }
+
+/* Barre d'actions du rapport */
+#view-diagnostic:has(#diag-report) .diag-shell { max-width: 820px; }
+.diag-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-2); }
+.diag-actions-right { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.diag-outline-btn {
+  display: inline-flex; align-items: center; min-height: 48px; padding: 0 var(--space-6); border-radius: 30px;
+  border: 2px solid var(--ay-heading); color: var(--ay-heading); font-weight: var(--weight-bold); text-decoration: none;
+}
+.diag-outline-btn:hover { background: var(--ay-heading); color: var(--bg-card); }
+.diag-print-hint { margin: 0 0 var(--space-6); text-align: right; font-size: var(--text-xs); color: var(--text-dim); }
+
+/* ── Le rapport : pages A4, toujours sur fond blanc ── */
+#diag-report {
+  --rp-navy: #004A76; --rp-blue: #00AEEF; --rp-mid: #0072B6; --rp-body: #4A5B68; --rp-muted: #8E8F9B;
+  --rp-border: #eef2f6; --rp-red: #DC533A; --rp-green: #068367;
+  display: flex; flex-direction: column; gap: var(--space-6);
+  color: var(--rp-body); font-family: var(--sans);
+}
+.rp-page {
+  position: relative; box-sizing: border-box; width: 100%; max-width: 210mm; min-height: 297mm;
+  margin: 0 auto; padding: 16mm 16mm 22mm; background: #fff; border-radius: 4px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.10); display: flex; flex-direction: column;
+}
+.rp-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 5mm; margin-bottom: 8mm; border-bottom: 1px solid var(--rp-border); font-size: 11px; color: var(--rp-muted); }
+.rp-logo { height: 26px; width: auto; }
+.rp-foot { position: absolute; left: 16mm; right: 16mm; bottom: 10mm; display: flex; justify-content: space-between; gap: 8mm; font-size: 10px; color: var(--rp-muted); }
+.rp-h { margin: 0 0 6mm; font-size: 26px; font-weight: 700; line-height: 1.2; color: var(--rp-navy); }
+.rp-h3 { margin: 7mm 0 3mm; font-size: 14px; font-weight: 700; color: var(--rp-navy); }
+.rp-p { margin: 0 0 4mm; font-size: 13px; line-height: 1.6; }
+.rp-p a { color: var(--rp-mid); font-weight: 700; text-decoration: none; }
+.rp-small { margin: 3mm 0 0; font-size: 11px; line-height: 1.55; color: var(--rp-muted); }
+
+/* Couverture */
+.rp-cover { padding: 20mm; justify-content: space-between;
+  background: linear-gradient(160deg, #ffffff 55%, #E6F7FD 100%); }
+.rp-cover::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6mm; background: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%); border-radius: 0 0 4px 4px; }
+.rp-cover-logo { height: 40px; width: auto; align-self: flex-start; }
+.rp-cover-body h1 { margin: 6mm 0 8mm; font-size: 40px; font-weight: 700; line-height: 1.1; color: var(--rp-navy); }
+.rp-cover-company { margin: 0 0 3mm; font-size: 24px; font-weight: 700;
+  background: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.rp-cover-meta { margin: 0; font-size: 14px; line-height: 1.7; color: var(--rp-body); }
+.rp-cover-foot { margin: 0 0 6mm; font-size: 11px; color: var(--rp-muted); }
+
+/* Synthèse */
+.rp-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-bottom: 8mm; }
+.rp-tile { display: flex; flex-direction: column; gap: 1.5mm; padding: 5mm; border-radius: 12px; border: 1px solid var(--rp-border); border-top: 3px solid var(--rp-blue); }
+.rp-tile.above { border-top-color: var(--rp-red); }
+.rp-tile.below { border-top-color: #00B08B; }
+.rp-tile-k { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--rp-mid); }
+.rp-tile-n { font-size: 30px; font-weight: 300; color: var(--rp-navy); font-variant-numeric: tabular-nums; }
+.rp-tile.above .rp-tile-n { color: var(--rp-red); }
+.rp-tile-l { font-size: 12px; line-height: 1.45; }
+.rp-findings { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3mm; text-align: left; }
+.rp-findings li { position: relative; padding-left: 7mm; font-size: 13px; line-height: 1.55; color: var(--rp-navy); }
+.rp-findings li::before { content: ''; position: absolute; left: 0; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(90deg, #00AEEF, #00B08B); }
+
+/* Barres */
+.rp-bars { display: flex; flex-direction: column; gap: 2.5mm; }
+.rp-bar { display: grid; grid-template-columns: 58mm 1fr 20mm; align-items: center; gap: 4mm; font-size: 12px; }
+.rp-bar-l { color: var(--rp-body); }
+.rp-bar-t { height: 10px; border-radius: 5px; background: #F6F6F6; overflow: hidden; }
+.rp-bar-t span { display: block; height: 100%; border-radius: 5px; background: #84D0F5; }
+.rp-bar.is-you .rp-bar-l { font-weight: 700; color: var(--rp-navy); }
+.rp-bar.is-you .rp-bar-t span { background: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%); }
+.rp-bar-v { text-align: right; font-weight: 700; color: var(--rp-navy); font-variant-numeric: tabular-nums; }
+
+.rp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rp-table th { text-align: right; padding: 2mm; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--rp-muted); border-bottom: 1px solid var(--rp-border); }
+.rp-table td { text-align: right; padding: 2.5mm 2mm; border-bottom: 1px solid var(--rp-border); font-weight: 700; color: var(--rp-navy); }
+.rp-table th:first-child, .rp-table td:first-child { text-align: left; font-weight: 400; color: var(--rp-body); }
+
+/* Cotisation */
+.rp-lines { border-top: 1px solid var(--rp-border); margin-bottom: 5mm; }
+.rp-line { display: flex; justify-content: space-between; gap: 6mm; padding: 2.8mm 0; border-bottom: 1px solid var(--rp-border); font-size: 13px; }
+.rp-line strong { color: var(--rp-navy); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rp-line.is-total span { font-weight: 700; color: var(--rp-navy); }
+.rp-callout { margin: 0 0 4mm; padding: 4mm 5mm; border-radius: 12px; background: #E6F7FD; font-size: 13px; line-height: 1.55; color: var(--rp-navy); }
+.rp-callout.above { background: #fbeae6; color: #9b3321; }
+
+/* Plan d'action */
+.rp-levers { margin: 0 0 4mm; padding: 0; list-style: none; counter-reset: lever; display: flex; flex-direction: column; gap: 4mm; text-align: left; }
+.rp-levers li { counter-increment: lever; position: relative; padding: 4mm 5mm 4mm 17mm; border-radius: 12px; border: 1px solid var(--rp-border); }
+.rp-levers li::before {
+  content: counter(lever); position: absolute; left: 5mm; top: 4mm; width: 8mm; height: 8mm; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px;
+  background: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%);
+}
+.rp-levers h3 { margin: 0 0 1.5mm; font-size: 14px; color: var(--rp-navy); }
+.rp-levers p { margin: 0 0 2mm; font-size: 12px; line-height: 1.5; }
+.rp-levers a { font-size: 12px; font-weight: 700; color: var(--rp-mid); text-decoration: none; }
+
+.rp-next { padding: 8mm; border-radius: 16px; color: #fff; background: linear-gradient(160deg, #004A76 0%, #278FC9 60%, #00AEEF 100%); }
+.rp-next h3 { margin: 0 0 2mm; font-size: 20px; color: #fff; }
+.rp-next p { margin: 0 0 4mm; font-size: 13px; line-height: 1.6; color: rgba(255, 255, 255, 0.92); }
+.rp-next a { color: #fff; font-weight: 700; }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  body[data-view="diagnostic"] .container { padding-top: calc(56px + var(--space-6)); }
+  .diag-card { padding: var(--space-6) var(--space-4); }
+  .diag-title { font-size: 1.375rem; }
+  .diag-fields { grid-template-columns: 1fr; }
+  .rp-page { min-height: 0; padding: 8mm 6mm 18mm; }
+  .rp-bar { grid-template-columns: 34% 1fr 16%; }
+  .rp-tiles { grid-template-columns: 1fr; }
+}
+
+/* ── Impression : seul le rapport sort, une page A4 par section ──
+   Deux pièges déjà rencontrés : base.css masque tout <footer> à l'impression (le pied de
+   page du rapport est donc un div), et un élément fixe comme .map-tap-panel s'imprime sur
+   chaque page, par-dessus le contenu. */
+@media print {
+  @page { size: A4; margin: 0; }
+  body[data-view="diagnostic"] .container { padding: 0 !important; max-width: none; }
+  body[data-view="diagnostic"] .diag-noprint,
+  body[data-view="diagnostic"] .bottom-nav,
+  .map-tap-panel, .map-tooltip, .skip-link { display: none !important; }
+  .diag-shell, #view-diagnostic:has(#diag-report) .diag-shell { max-width: none; }
+  #diag-report { display: block; gap: 0; }
+  .rp-page { width: 210mm; max-width: none; height: 297mm; min-height: 0; margin: 0; border-radius: 0; box-shadow: none; overflow: hidden; break-after: page; }
+  .rp-page:last-child { break-after: auto; }
+  .rp-cover::after { border-radius: 0; }
+}
+
+/* Champ à suggestions (entreprise, fonction) : le champ garde le style des autres, la liste
+   s'ancre dessous. */
+.diag-picker { position: relative; }
+.diag-picker .autocomplete { border-radius: 8px; }
+.diag-picker .ac-item { flex-direction: column; align-items: flex-start; gap: 2px; }
+.diag-picker .ac-item .libelle { white-space: normal; color: var(--text); }
+.diag-picker .ac-sub { font-size: var(--text-xs); color: var(--text-dim); }

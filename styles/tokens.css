@@ -1,0 +1,154 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Jetons de design. Source unique des valeurs partagées par les DEUX pages :
+   index.html (la landing, dont le reste du style est en ligne) et app.html.
+
+   Règle : aucune valeur d'espacement, de rayon ou de taille de texte n'est
+   écrite en dur ailleurs. On prend un cran de l'échelle, ou on ajoute un cran
+   ici en le justifiant. C'est ce qui empêche de réinventer un 11px.
+
+   Les couleurs restent déclarées dans base.css pour l'app, qui gère aussi le
+   thème sombre ; ce fichier ne porte que ce que les deux pages partagent.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Espacement. Trame de 4px : chaque cran est un multiple, sans exception. */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ── Rayons. Quatre crans, plus la pilule. Au-delà, les formes cessent
+        de se ressembler d'un composant à l'autre. */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* ── Typographie. Échelle nommée, rapport constant d'environ 1,2.
+        --text-xs est le PLANCHER de lisibilité : 12px. Rien d'interactif ni
+        de porteur de sens ne descend en dessous, c'est ce qui a produit les
+        42 constats de texte trop petit. */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.375rem;   /* 22px */
+  --text-2xl: 1.75rem;   /* 28px */
+  --text-3xl: 2.25rem;   /* 36px */
+  --text-4xl: 3rem;      /* 48px */
+
+  /* ── Graisses et interlignes, pour cesser de les improviser aussi. */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-normal: 1.6;
+
+
+  /* ── Mouvement. Le dépôt n'avait aucun vocabulaire de courbe ni de durée, donc
+        chaque animation improvisait la sienne. Budget : une interface d'outil reste
+        sous 300 ms, seul le marketing peut s'étirer. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-press: 160ms;   /* retour au clic, à la limite du perceptible */
+  --dur-pop: 150ms;     /* listes déroulantes, popovers */
+  --dur-panel: 250ms;   /* panneaux, tiroirs */
+  --dur-exit: 200ms;    /* une sortie est plus rapide qu'une entrée */
+
+  /* ── Cible tactile minimale, WCAG 2.5.8. Toute zone cliquable la respecte. */
+  --tap-min: 44px;
+}
+
+/* ── Couleurs partagées par les deux pages. Déplacées ici le 2026-09-01 :
+      elles étaient déclarées deux fois, dans base.css et en ligne dans la landing,
+      et avaient déjà divergé. Les quelques valeurs qui diffèrent réellement entre
+      les deux pages (--card-shadow, --danger-dim, --safe-dim) restent locales,
+      les unifier changerait l'apparence de l'une des deux. */
+:root {
+  /* Charte Ayming (~/projects/ayming/DESIGN.md). --accent est le bleu moyen de la charte
+     et non #00AEEF, trop clair pour du texte sur blanc (2,6:1) ; #00AEEF reste --brand,
+     pour les aplats et le dégradé signature. */
+  --bg: #f8fafc;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --border: #e3e9ef;
+  --border-light: #eef2f6;
+  --text: #0f172a;
+  --text-secondary: #4a5b68;
+  --text-dim: #6b7280;
+  --heading: #004a76;
+  --accent: #0072b6;
+  --accent-glow: rgba(0,174,239,0.10);
+  --on-accent: #ffffff;
+  --brand: #00aeef;
+  --brand-grad: linear-gradient(90deg, #00aeef, #00b08b);
+  --danger: #dc533a;
+  --safe: #068367;
+  /* Une seule police dans la charte : les codes et chiffres passent en Lato à chasse fixe
+     (tabular-nums sur body), l'ancien --mono reste pour ne pas toucher 40 règles. */
+  --mono: 'Lato', -apple-system, sans-serif;
+  --sans: 'Lato', -apple-system, sans-serif;
+
+  /* Bandeaux pleine largeur : ce qui sépare une section de la suivante. */
+  --band-white: #ffffff;
+  --band-tint: #f4fbff;
+  --band-grey: #f8fafc;
+  --band-navy: #004a76;
+
+  /* Palette des graphiques, lue par themeColor(). Bleus et vert de la charte, plus un orange
+     hors charte (--c-orange) que José a demandé pour distinguer les parts du graphique des
+     causes ; le rouge ne sert qu'à signaler (décès, au-dessus de la moyenne). */
+  --c-1: #00aeef;
+  --c-2: #004a76;
+  --c-3: #00b08b;
+  --c-4: #0072b6;
+  --c-5: #7fd3f5;
+  --c-6: #6d8093;
+  --c-7: #068367;
+  --c-8: #a7bccb;
+  --c-orange: #e3700d;
+  --c-danger: #dc533a;
+  --c-muted: #94a3b8;
+}
+
+[data-theme="dark"] {
+  --bg: #0a1824;
+  --bg-elevated: #0f2233;
+  --bg-card: #112a3f;
+  --border: #1e3a52;
+  --border-light: #25465f;
+  --text: #e8f0f6;
+  --text-secondary: #a9bccb;
+  --text-dim: #8aa0b2;
+  --heading: #e8f0f6;
+  --accent: #4cc3f2;
+  --accent-glow: rgba(0,174,239,0.14);
+  --on-accent: #0a1824;
+  --danger: #ef6a52;
+  --safe: #34c29a;
+
+  --band-white: #0f2233;
+  --band-tint: #0c1f2f;
+  --band-grey: #0a1824;
+  --band-navy: #05121c;
+
+  --c-2: #7fb8dc;
+  --c-4: #4ea3d8;
+  --c-6: #8aa0b2;
+  --c-7: #34c29a;
+  --c-8: #4d6b82;
+  --c-danger: #ef6a52;
+  --c-muted: #6d8093;
+}

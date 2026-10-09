@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<!-- Les pages vivent à deux dossiers de profondeur (/accidents-du-travail/4711d-supermarches/) :
+     la base fait partir styles/, js/, assets/ et data/ de la racine du site. scripts/prerender.py
+     la réécrit pour le site de repli, publié sous /sinistralite-france/. -->
+<base href="/">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<!-- Cette page ne contient aucun script inline, script-src reste donc strict.
+     style-src autorise 'unsafe-inline' pour les attributs style= du markup.
+     img-src autorise data: pour le favicon SVG. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://recherche-entreprises.api.gouv.fr https://go.ayming.fr; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Traitement et revêtement des métaux (2561Z), accidents du travail | Sinistralité France</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20x='5'%20y='18'%20width='6'%20height='9'%20rx='1'%20fill='%23002395'/%3E%3Crect%20x='13'%20y='11'%20width='6'%20height='16'%20rx='1'%20fill='white'%20stroke='%23ccc'%20stroke-width='0.5'/%3E%3Crect%20x='21'%20y='5'%20width='6'%20height='22'%20rx='1'%20fill='%23ED2939'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/driver.js@1.8.0/dist/driver.js.iife.js" integrity="sha384-ZD4UAn12lO2plEJ4lonOHO0fRSCgq0VAuoDx6/rglijDjzDYIXgCexIVu3PFJpJf" crossorigin="anonymous"></script>
+<script defer src="js/icons.js?v=f8b7846"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.8.0/dist/driver.css" integrity="sha384-XUGWln86d3kDvw/W1Qbii8QQyeWs2LcFYfGhYrmSZ0ZiXxowttKpfdhPdLE+WMFx" crossorigin="anonymous">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/motion.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/nav.css">
+<link rel="stylesheet" href="styles/search.css">
+<link rel="stylesheet" href="styles/kpi.css">
+<link rel="stylesheet" href="styles/charts.css">
+<link rel="stylesheet" href="styles/drawers.css">
+<link rel="stylesheet" href="styles/assistant.css">
+<link rel="stylesheet" href="styles/map.css">
+<link rel="stylesheet" href="styles/compare.css">
+<link rel="stylesheet" href="styles/diagnostic.css">
+<link rel="stylesheet" href="styles/report.css">
+<link rel="stylesheet" href="styles/tour.css">
+<link rel="stylesheet" href="styles/sidebar.css">
+<link rel="stylesheet" href="styles/mockup.css">
+<link rel="stylesheet" href="styles/home.css">
+<link rel="stylesheet" href="styles/share.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+<!-- Barre du haut, mobile seulement : le menu latéral la remplace sur ordinateur -->
+<nav class="top-nav">
+  <a href="accueil/" class="top-nav-logo" aria-label="Accueil de l'outil, Ayming, sinistralité AT/MP"><img src="assets/ayming-logo.png" alt="Ayming" width="70" height="28"><span class="top-nav-product">Sinistralité AT/MP</span></a>
+  <div class="top-nav-right">
+    <button type="button" class="top-help" id="tourBtn" data-tour-start aria-label="Visite guidée" title="Visite guidée">?</button>
+    <button type="button" class="top-theme" id="themeToggle" aria-label="Changer le thème"><i data-lucide="moon" class="icon-moon"></i><i data-lucide="sun" class="icon-sun"></i></button>
+  </div>
+</nav>
+
+<!-- Menu latéral, ordinateur seulement (la barre du bas prend le relais sur mobile) -->
+<aside class="sidebar" id="sidebar" aria-label="Menu principal">
+  <div class="sb-head">
+    <a href="accueil/" class="sb-logo" aria-label="Accueil de l'outil, Ayming, sinistralité AT/MP"><img src="assets/ayming-logo.png" alt="Ayming" width="70" height="28"><span class="sb-product">Sinistralité AT/MP</span></a>
+    <button type="button" class="sb-collapse" id="sbCollapse" aria-label="Réduire le menu" title="Réduire le menu" aria-expanded="true" aria-controls="sidebar"><i data-lucide="panel-left-close" class="icon-close"></i><i data-lucide="panel-left-open" class="icon-open"></i></button>
+  </div>
+  <nav class="sb-tabs" aria-label="Vues">
+    <button type="button" class="nav-item" data-view="home" data-label="Accueil" aria-label="Accueil">
+      <span class="nav-icon-wrap"><i data-lucide="house"></i></span>
+      <span class="sb-label">Accueil</span>
+    </button>
+    <button type="button" class="nav-item" data-view="compare" data-label="Mon entreprise" aria-label="Mon entreprise">
+      <span class="nav-icon-wrap"><i data-lucide="building-2"></i></span>
+      <span class="sb-label">Mon entreprise</span>
+      <span class="sb-dot" hidden></span>
+    </button>
+    <button type="button" class="nav-item active" data-view="at" data-label="Accidents du Travail" aria-label="Accidents du Travail">
+      <span class="nav-icon-wrap"><i data-lucide="hard-hat"></i></span>
+      <span class="sb-label">Accidents du Travail</span>
+      <span class="sb-dot" hidden></span>
+    </button>
+    <button type="button" class="nav-item" data-view="mp" data-label="Maladies Professionnelles" aria-label="Maladies Professionnelles">
+      <span class="nav-icon-wrap"><i data-lucide="thermometer"></i></span>
+      <span class="sb-label">Maladies Pro.</span>
+      <span class="sb-dot" hidden></span>
+    </button>
+    <button type="button" class="nav-item" data-view="trajet" data-label="Accidents de Trajet" aria-label="Accidents de Trajet">
+      <span class="nav-icon-wrap"><i data-lucide="car"></i></span>
+      <span class="sb-label">Trajet</span>
+      <span class="sb-dot" hidden></span>
+    </button>
+  </nav>
+  <div class="sb-foot">
+    <button type="button" class="nav-item" data-tour-start data-label="Visite guidée" aria-label="Visite guidée">
+      <span class="nav-icon-wrap"><i data-lucide="circle-help"></i></span>
+      <span class="sb-label">Visite guidée</span>
+    </button>
+    <div class="sb-menu">
+      <button type="button" class="nav-item sb-trigger" id="sbResBtn" data-label="Ressources" aria-label="Ressources" aria-expanded="false" aria-controls="sbResPop">
+        <span class="nav-icon-wrap"><i data-lucide="book-open"></i></span>
+        <span class="sb-label">Ressources</span>
+        <i data-lucide="chevron-down" class="sb-chev"></i>
+      </button>
+      <div class="sb-pop sb-pop-res" id="sbResPop" hidden></div>
+    </div>
+    <div class="fs sb-steps" id="sbSteps" role="region" aria-label="Premiers pas" hidden></div>
+    <div class="sb-promo" id="sbPromo" role="region" aria-label="À découvrir" hidden></div>
+    <div class="sb-menu">
+      <button type="button" class="sb-account" id="sbAccBtn" aria-label="Menu du compte" aria-expanded="false" aria-controls="sbAccPop">
+        <span class="sb-avatar" id="sbAvatar" aria-hidden="true">I</span>
+        <span class="sb-who"><span class="sb-name" id="sbName">Invité</span><span class="sb-org" id="sbOrg"></span></span>
+        <i data-lucide="chevron-down" class="sb-chev"></i>
+      </button>
+      <div class="sb-pop sb-pop-acc" id="sbAccPop" hidden>
+        <button type="button" class="sb-pop-item sb-switch" id="sbThemeSwitch" role="switch" aria-checked="false">
+          <span class="sb-pop-ico"><i data-lucide="moon"></i></span>
+          <span class="sb-pop-txt">Mode sombre</span>
+          <span class="sb-track" aria-hidden="true"><span class="sb-thumb"></span></span>
+        </button>
+        <button type="button" class="sb-pop-item" id="sbProfile">
+          <span class="sb-pop-ico"><i data-lucide="users"></i></span>
+          <span class="sb-pop-txt">Mon prénom et mon secteur</span>
+        </button>
+        <a class="sb-pop-item" href="mentions-legales.html" target="_blank" rel="noopener">
+          <span class="sb-pop-ico"><i data-lucide="file-text"></i></span>
+          <span class="sb-pop-txt">Mentions légales</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="container" id="main-content" tabindex="-1">
+
+  <div class="loading-skeleton" id="loadingSkeleton">
+    <div class="skeleton-header">
+      <div class="skeleton-line skeleton-title"></div>
+      <div class="skeleton-line skeleton-subtitle"></div>
+    </div>
+    <div class="skeleton-kpi-grid">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+    <div class="skeleton-charts">
+      <div class="skeleton-chart-card"></div>
+      <div class="skeleton-chart-card"></div>
+    </div>
+  </div>
+
+  <div class="error-state" id="errorState" style="display:none">
+    <div class="error-content">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <h2>Erreur de chargement</h2>
+      <p id="errorMessage">Impossible de charger les données.</p>
+      <button class="retry-btn" id="retryBtn">Réessayer</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-eyebrow" id="headerEyebrow">Données 2024</div>
+    <h1 id="headerTitle">Accidents du Travail par Secteur</h1>
+    <p id="headerSubtitle">Statistiques de sinistralité par code NAF. Sélectionnez un secteur pour commencer.</p>
+  </header>
+
+  <!-- AT VIEW -->
+  <div class="view active" id="view-at">
+    <div class="search-section">
+      <div class="search-row">
+        <div class="search-wrapper">
+          <span class="icon">/</span>
+          <input type="text" id="at-searchInput" aria-label="Rechercher un secteur par code NAF ou mot-clé" placeholder="Tapez un code NAF ou un mot-clé pour explorer un secteur..." autocomplete="off">
+          <div class="level-tabs" id="at-levelTabs">
+            <button data-level="naf1" aria-label="Niveau section NAF">Section</button>
+            <button data-level="naf2" class="active" aria-label="Niveau NAF 2">NAF2</button>
+            <button data-level="naf4" aria-label="Niveau NAF 4">NAF4</button>
+            <button data-level="naf5" aria-label="Niveau NAF 5 (complet)">NAF</button>
+          </div>
+          <div class="autocomplete" id="at-autocomplete"></div>
+        </div>
+        <div class="action-icons">
+          <button class="action-btn" id="at-shareBtn" aria-label="Partager" aria-expanded="false" data-tip="Partager"><i data-lucide="share-2"></i></button>
+          <button class="action-btn" id="at-insightsBtn" aria-label="Afficher les insights" aria-expanded="false" data-tip="Insights"><i data-lucide="sparkles"></i><span class="notif-badge" id="at-insightsBadge"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="at-emptyState">
+      <div class="empty-inner">
+        <div class="national-state" id="at-nationalState"></div>
+      </div>
+    </div>
+
+    <div class="results-section bands" id="at-results">
+      <section class="band band-sel">
+      <div class="selection-header">
+        <div class="breadcrumb" id="at-breadcrumb"></div>
+        <h2 id="at-selTitle"></h2>
+        <div class="sub" id="at-selSub"></div>
+      </div>
+      <div class="inline-compare" id="at-cmpBar" style="display:none">
+        <span class="inline-compare-label">Comparer</span>
+        <span class="cmp-current-pill" id="at-cmpCurrent"></span>
+        <div class="compare-chips" id="at-cmpChips" aria-label="Secteurs comparés"></div>
+        <button type="button" class="cmp-add-btn" id="at-cmpAddBtn">+ Ajouter une comparaison</button>
+        <div class="search-wrapper inline-compare-search" id="at-cmpSearchWrap" style="display:none">
+          <span class="icon">/</span>
+          <input type="text" id="at-cmpAddInput" aria-label="Ajouter un secteur NAF5 à comparer" placeholder="Code NAF ou libellé à comparer..." autocomplete="off">
+          <div class="autocomplete" id="at-cmpAutocomplete"></div>
+        </div>
+      </div>
+      <div class="year-bar" id="at-yearBar" hidden></div>
+      <div class="kpi-grid" id="at-kpiGrid"></div>
+      <p class="kpi-note" id="at-kpiNote" hidden></p>
+      </section>
+      <section class="band band-grey">
+        <div class="band-head"><p class="band-eyebrow">Positionnement</p><h2 class="band-title">Le secteur face aux autres secteurs</h2></div>
+      <div class="comparison-card" id="at-compCard">
+        <div class="comp-header">
+          <h3 id="at-compTitle">Comparaison</h3>
+          <div class="comp-toggle" id="at-compToggle">
+            <button class="active" data-mode="chart" aria-label="Afficher en graphique"><i data-lucide="bar-chart-3"></i></button>
+            <button data-mode="table" aria-label="Afficher en tableau"><i data-lucide="list"></i></button>
+          </div>
+        </div>
+        <div class="chart-wrap" id="at-compWrap" style="height:320px"><canvas id="at-compChart"></canvas></div>
+        <div class="comp-table-wrap" id="at-compTable"></div>
+      </div>
+      <div class="position-card" id="at-positionCard">
+        <h3 id="at-posTitle">Positionnement IF</h3>
+        <div class="pos-strip-wrap" id="at-posStrip"></div>
+      </div>
+      </section>
+      <section class="band">
+        <div class="band-head"><p class="band-eyebrow">Gravité</p><h2 class="band-title">Causes et gravité des accidents</h2></div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <h3>Causes d'accidents</h3>
+          <div class="chart-wrap" id="at-causesWrap" style="height:320px"><canvas id="at-causesChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Cascade de sévérité</h3>
+          <div id="at-funnelWrap"></div>
+        </div>
+      </div>
+      </section>
+      <section class="band band-grey" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Population</p><h2 class="band-title">Qui est touché</h2></div>
+      <div class="demo-section" id="at-demoSection" style="display:none">
+        <h3 class="evo-title">Démographie des AT</h3>
+        <p class="injury-sub">Part des accidents du travail du secteur selon le sexe et l'âge de la victime. La durée de leurs arrêts se lit dans la bande Arrêts. La barre pâle est la part nationale, en rouge ce qui la dépasse d'au moins 10 %.</p>
+        <div class="demo-grid">
+          <div class="demo-card"><div class="demo-chart-wrap"><canvas id="at-demoSex"></canvas></div></div>
+          <div class="demo-card"><div class="demo-chart-wrap"><canvas id="at-demoAge"></canvas></div></div>
+        </div>
+      </div>
+      <div class="size-section" id="at-sizeSection" style="display:none">
+        <h3 class="evo-title">Sinistralité par taille d'établissement</h3>
+        <p class="size-sub" id="at-sizeSub"></p>
+        <div class="chart-card">
+          <div class="chart-wrap" id="at-sizeWrap" style="height:340px"><canvas id="at-sizeChart"></canvas></div>
+        </div>
+      </div>
+      </section>
+      <section class="band" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Mécanismes</p><h2 class="band-title">Comment l'accident survient</h2></div>
+      <div class="nature-row">
+        <div class="injury-section" id="at-siegeSection" style="display:none">
+          <h3 class="evo-title">Siège des lésions</h3>
+          <p class="injury-sub" id="at-siegeSub"></p>
+          <div class="bf-grid" id="at-siegeGrid"></div>
+        </div>
+        <div class="injury-section" id="at-injurySection" style="display:none">
+          <h3 class="evo-title">Nature des accidents</h3>
+          <p class="injury-sub">Ce que faisait la victime, et comment la blessure survient. Part des accidents du travail du secteur, valeurs « non déterminées » exclues. La barre pâle est la part nationale, en rouge ce qui la dépasse d'au moins 10 %.</p>
+          <div class="injury-grid"></div>
+        </div>
+      </div>
+      <div class="injury-section" id="at-circSection" style="display:none">
+        <h3 class="evo-title">Circonstances détaillées</h3>
+        <p class="injury-sub">Ce qui a dérapé, et avec quoi, les deux leviers d'une action de prévention. Part des accidents du travail du secteur, huit premières modalités, valeurs non précisées exclues. La barre pâle est la part nationale, en rouge ce qui la dépasse d'au moins 10 %.</p>
+        <div class="injury-grid"></div>
+      </div>
+      </section>
+      <section class="band band-tint" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Arrêts</p><h2 class="band-title">Combien de jours coûte chaque accident</h2></div>
+      <div class="injury-section" id="at-severitySection" style="display:none">
+        <p class="injury-sub">Nombre moyen de journées d'arrêt pour un sinistre, selon ses caractéristiques. Seules comptent les modalités qui pèsent au moins 2 % des sinistres du secteur. Le trait vertical marque le national, en rouge ce qui le dépasse d'au moins 10 %.</p>
+        <div class="injury-grid"></div>
+      </div>
+      </section>
+      <section class="band" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Absence</p><h2 class="band-title">L'absence liée au travail</h2></div>
+        <div class="injury-section" id="at-absenceSection" style="display:none">
+          <p class="absence-headline" id="at-absenceHeadline"></p>
+          <div class="absence-wrap"><canvas id="at-absenceChart"></canvas></div>
+          <p class="injury-sub" id="at-absenceNote"></p>
+        </div>
+      </section>
+      <section class="band band-grey" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Tendance</p><h2 class="band-title">Dix ans d'évolution</h2></div>
+      <div class="evo-section" id="at-trendSection" style="display:none">
+        <p class="injury-sub" id="at-trendSub"></p>
+        <div class="evo-grid" id="at-trendGrid"></div>
+      </div>
+      </section>
+    </div>
+
+    <!-- Carte régionale AT -->
+    <section class="band" data-map>
+      <div class="band-head"><p class="band-eyebrow">Territoire</p><h2 class="band-title">Sinistralité par caisse régionale</h2></div>
+    <div class="map-section" id="at-mapSection" data-follows-sector>
+      <p class="map-headline" id="at-mapHeadline" aria-live="polite"></p>
+      <div class="map-controls">
+        <span class="year-label">Année</span>
+        <div class="year-pills" id="at-yearSelect">
+          <button class="year-pill" data-year="2020">2020</button>
+          <button class="year-pill" data-year="2021">2021</button>
+          <button class="year-pill" data-year="2022">2022</button>
+          <button class="year-pill" data-year="2023">2023</button>
+          <button class="year-pill active" data-year="2024">2024</button>
+        </div>
+        <span class="year-label">Mesure</span>
+        <div class="year-pills" id="at-metricSelect">
+          <button class="year-pill active" data-metric="count">Nombre</button>
+          <button class="year-pill" data-metric="if">Indice de fréquence</button>
+        </div>
+      </div>
+      <div class="map-body">
+      <div class="map-wrap">
+        <svg
+          id="france-map-at"
+          class="map-svg"
+          viewBox="0 0 667 578"
+          width="100%"
+          role="img"
+          aria-label="Carte de France par caisse régionale - Accidents du Travail">
+        </svg>
+      </div>
+      <div class="map-ranking" id="at-mapRanking">
+        <div class="ranking-header">
+          <span class="ranking-title">Classement</span>
+          <button class="ranking-sort-btn" id="at-sortBtn" title="Inverser l'ordre" aria-label="Inverser l'ordre du classement">&#x25BC;</button>
+        </div>
+        <ol class="ranking-list" id="at-rankingList"></ol>
+      </div>
+      </div>
+      <div class="map-legend" id="at-mapLegend" aria-label="Légende de la carte AT"></div>
+      <p class="map-note" id="at-mapNote">La carte porte sur les accidents du travail de tous les secteurs d'activité, par caisse. Choisissez un secteur pour voir où travaillent ses salariés. Elle couvre les 21 caisses, les cinq caisses ultramarines dans les encarts de gauche.</p>
+    </div>
+    </section>
+  </div>
+
+  <!-- MP VIEW -->
+  <div class="view" id="view-mp">
+    <div class="search-section">
+      <div class="search-row">
+        <div class="search-wrapper">
+          <span class="icon">/</span>
+          <input type="text" id="mp-searchInput" aria-label="Rechercher un secteur par code NAF ou mot-clé" placeholder="Tapez un code NAF ou un mot-clé pour explorer un secteur..." autocomplete="off">
+          <div class="level-tabs" id="mp-levelTabs">
+            <button data-level="naf1" aria-label="Niveau section NAF">Section</button>
+            <button data-level="naf2" class="active" aria-label="Niveau NAF 2">NAF2</button>
+            <button data-level="naf4" aria-label="Niveau NAF 4">NAF4</button>
+            <button data-level="naf5" aria-label="Niveau NAF 5 (complet)">NAF</button>
+          </div>
+          <div class="autocomplete" id="mp-autocomplete"></div>
+        </div>
+        <div class="action-icons">
+          <button class="action-btn" id="mp-shareBtn" aria-label="Partager" aria-expanded="false" data-tip="Partager"><i data-lucide="share-2"></i></button>
+          <button class="action-btn" id="mp-insightsBtn" aria-label="Afficher les insights" aria-expanded="false" data-tip="Insights"><i data-lucide="sparkles"></i><span class="notif-badge" id="mp-insightsBadge"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="mp-emptyState">
+      <div class="empty-inner">
+        <div class="national-state" id="mp-nationalState"></div>
+      </div>
+    </div>
+
+    <section class="band" data-map>
+      <div class="band-head"><p class="band-eyebrow">Territoire</p><h2 class="band-title">Sinistralité par caisse régionale</h2></div>
+    <div class="map-section" id="mp-mapSection">
+      <div class="mp-map-unavailable">
+        <p>Les données régionales ne sont pas disponibles pour les maladies professionnelles.</p>
+        <p>Les maladies professionnelles ne sont pas encore cartographiées par caisse régionale.</p>
+      </div>
+    </div>
+    </section>
+
+    <div class="results-section bands" id="mp-results">
+      <section class="band band-sel">
+      <div class="selection-header">
+        <div class="breadcrumb" id="mp-breadcrumb"></div>
+        <h2 id="mp-selTitle"></h2>
+        <div class="sub" id="mp-selSub"></div>
+      </div>
+      <div class="inline-compare" id="mp-cmpBar" style="display:none">
+        <span class="inline-compare-label">Comparer</span>
+        <span class="cmp-current-pill" id="mp-cmpCurrent"></span>
+        <div class="compare-chips" id="mp-cmpChips" aria-label="Secteurs comparés"></div>
+        <button type="button" class="cmp-add-btn" id="mp-cmpAddBtn">+ Ajouter une comparaison</button>
+        <div class="search-wrapper inline-compare-search" id="mp-cmpSearchWrap" style="display:none">
+          <span class="icon">/</span>
+          <input type="text" id="mp-cmpAddInput" aria-label="Ajouter un secteur NAF5 à comparer" placeholder="Code NAF ou libellé à comparer..." autocomplete="off">
+          <div class="autocomplete" id="mp-cmpAutocomplete"></div>
+        </div>
+      </div>
+      <div class="year-bar" id="mp-yearBar" hidden></div>
+      <div class="kpi-grid" id="mp-kpiGrid"></div>
+      <p class="kpi-note" id="mp-kpiNote" hidden></p>
+      </section>
+      <section class="band band-grey">
+        <div class="band-head"><p class="band-eyebrow">Positionnement</p><h2 class="band-title">Le secteur face aux autres secteurs</h2></div>
+      <div class="comparison-card" id="mp-compCard">
+        <div class="comp-header">
+          <h3 id="mp-compTitle">Comparaison</h3>
+          <div class="comp-toggle" id="mp-compToggle">
+            <button class="active" data-mode="chart" aria-label="Afficher en graphique"><i data-lucide="bar-chart-3"></i></button>
+            <button data-mode="table" aria-label="Afficher en tableau"><i data-lucide="list"></i></button>
+          </div>
+        </div>
+        <div class="chart-wrap" id="mp-compWrap" style="height:320px"><canvas id="mp-compChart"></canvas></div>
+        <div class="comp-table-wrap" id="mp-compTable"></div>
+      </div>
+      <div class="position-card" id="mp-positionCard">
+        <h3 id="mp-posTitle">Positionnement IF</h3>
+        <div class="pos-strip-wrap" id="mp-posStrip"></div>
+      </div>
+      </section>
+      <section class="band">
+        <div class="band-head"><p class="band-eyebrow">Gravité</p><h2 class="band-title">Types de maladies et gravité</h2></div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <h3>Types de maladies</h3>
+          <p class="injury-sub">Part des MP du secteur portant ce caractère. Une même maladie peut en porter plusieurs, les parts ne s'additionnent donc pas à 100 %.</p>
+          <div class="chart-wrap" id="mp-causesWrap" style="height:320px"><canvas id="mp-causesChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Cascade de sévérité</h3>
+          <div id="mp-funnelWrap"></div>
+        </div>
+      </div>
+      </section>
+      <section class="band band-grey" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Population</p><h2 class="band-title">Qui est touché</h2></div>
+      <div class="demo-section" id="mp-demoSection" style="display:none">
+        <h3 class="evo-title">Démographie des MP</h3>
+        <p class="injury-sub">Part des maladies professionnelles du secteur selon le sexe et l'âge de la victime. La durée de leurs arrêts se lit dans la bande Arrêts. La barre pâle est la part nationale, en rouge ce qui la dépasse d'au moins 10 %.</p>
+        <div class="demo-grid">
+          <div class="demo-card"><div class="demo-chart-wrap"><canvas id="mp-demoSex"></canvas></div></div>
+          <div class="demo-card"><div class="demo-chart-wrap"><canvas id="mp-demoAge"></canvas></div></div>
+        </div>
+      </div>
+      </section>
+      <section class="band" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Mécanismes</p><h2 class="band-title">Profil des maladies reconnues</h2></div>
+      <div class="injury-section" id="mp-profileSection" style="display:none">
+        <h3 class="evo-title">Profil des maladies professionnelles</h3>
+        <p class="injury-sub">Quelles maladies sont reconnues, après combien de temps d'exposition, et chez qui. Part des MP en 1er règlement du secteur. La barre pâle est la part nationale, en rouge ce qui la dépasse d'au moins 10 %.</p>
+        <div class="injury-grid"></div>
+      </div>
+      <div class="injury-section" id="mp-psySection" style="display:none">
+        <h3 class="evo-title">Maladies psychiques et maladies hors tableau</h3>
+        <p class="injury-sub">Aucun tableau ne couvre les troubles psychiques. Ils sont reconnus hors tableau, au cas par cas, et forment la plus grande part des MP hors tableau en France. Le nombre de maladies psychiques reconnues chaque année depuis 2015, puis la part de chaque famille de maladies parmi les MP hors tableau du secteur.</p>
+        <div class="injury-grid"></div>
+      </div>
+      <div class="injury-section" id="mp-bodySection" style="display:none">
+        <h3 class="evo-title">Troubles musculosquelettiques par partie du corps</h3>
+        <p class="injury-sub" id="mp-bodySub"></p>
+        <div class="bf-grid" id="mp-bodyGrid"></div>
+      </div>
+      <div class="disease-section" id="mp-diseaseSection" style="display:none">
+        <h3 class="evo-title">Détail par tableau de maladie professionnelle</h3>
+        <p class="injury-sub">Tous les tableaux ayant au moins un cas dans ce secteur, avec les séquelles et les journées perdues qu'ils portent. La dernière ligne regroupe les maladies reconnues hors tableau, au titre de l'alinéa 7.</p>
+        <div class="disease-wrap" id="mp-diseaseWrap"></div>
+      </div>
+      </section>
+      <section class="band band-tint" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Arrêts</p><h2 class="band-title">Combien de jours coûte chaque maladie</h2></div>
+      <div class="injury-section" id="mp-severitySection" style="display:none">
+        <p class="injury-sub">Nombre moyen de journées d'arrêt pour une maladie reconnue, selon la maladie, l'âge, la durée d'exposition et la profession. Seules comptent les modalités qui pèsent au moins 2 % des maladies du secteur. Le trait vertical marque le national, en rouge ce qui le dépasse d'au moins 10 %.</p>
+        <div class="injury-grid"></div>
+      </div>
+      </section>
+      <section class="band" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Absence</p><h2 class="band-title">L'absence liée au travail</h2></div>
+        <div class="injury-section" id="mp-absenceSection" style="display:none">
+          <p class="absence-headline" id="mp-absenceHeadline"></p>
+          <div class="absence-wrap"><canvas id="mp-absenceChart"></canvas></div>
+          <p class="injury-sub" id="mp-absenceNote"></p>
+        </div>
+      </section>
+      <section class="band band-grey" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Tendance</p><h2 class="band-title">Dix ans d'évolution</h2></div>
+      <div class="evo-section" id="mp-trendSection" style="display:none">
+        <p class="injury-sub" id="mp-trendSub"></p>
+        <div class="evo-grid" id="mp-trendGrid"></div>
+      </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- TRAJET VIEW -->
+  <div class="view" id="view-trajet">
+    <div class="search-section">
+      <div class="search-row">
+        <div class="search-wrapper">
+          <span class="icon">/</span>
+          <input type="text" id="trajet-searchInput" aria-label="Rechercher un secteur par code NAF ou mot-clé" placeholder="Tapez un code NAF ou un mot-clé pour explorer un secteur..." autocomplete="off">
+          <div class="level-tabs" id="trajet-levelTabs">
+            <button data-level="naf1" aria-label="Niveau section NAF">Section</button>
+            <button data-level="naf2" class="active" aria-label="Niveau NAF 2">NAF2</button>
+            <button data-level="naf4" aria-label="Niveau NAF 4">NAF4</button>
+            <button data-level="naf5" aria-label="Niveau NAF 5 (complet)">NAF</button>
+          </div>
+          <div class="autocomplete" id="trajet-autocomplete"></div>
+        </div>
+        <div class="action-icons">
+          <button class="action-btn" id="trajet-shareBtn" aria-label="Partager" aria-expanded="false" data-tip="Partager"><i data-lucide="share-2"></i></button>
+          <button class="action-btn" id="trajet-insightsBtn" aria-label="Afficher les insights" aria-expanded="false" data-tip="Insights"><i data-lucide="sparkles"></i><span class="notif-badge" id="trajet-insightsBadge"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="trajet-emptyState">
+      <div class="empty-inner">
+        <div class="national-state" id="trajet-nationalState"></div>
+      </div>
+    </div>
+
+    <div class="results-section bands" id="trajet-results">
+      <section class="band band-sel">
+      <div class="selection-header">
+        <div class="breadcrumb" id="trajet-breadcrumb"></div>
+        <h2 id="trajet-selTitle"></h2>
+        <div class="sub" id="trajet-selSub"></div>
+      </div>
+      <div class="inline-compare" id="trajet-cmpBar" style="display:none">
+        <span class="inline-compare-label">Comparer</span>
+        <span class="cmp-current-pill" id="trajet-cmpCurrent"></span>
+        <div class="compare-chips" id="trajet-cmpChips" aria-label="Secteurs comparés"></div>
+        <button type="button" class="cmp-add-btn" id="trajet-cmpAddBtn">+ Ajouter une comparaison</button>
+        <div class="search-wrapper inline-compare-search" id="trajet-cmpSearchWrap" style="display:none">
+          <span class="icon">/</span>
+          <input type="text" id="trajet-cmpAddInput" aria-label="Ajouter un secteur NAF5 à comparer" placeholder="Code NAF ou libellé à comparer..." autocomplete="off">
+          <div class="autocomplete" id="trajet-cmpAutocomplete"></div>
+        </div>
+      </div>
+      <div class="year-bar" id="trajet-yearBar" hidden></div>
+      <div class="kpi-grid" id="trajet-kpiGrid"></div>
+      <p class="kpi-note" id="trajet-kpiNote" hidden></p>
+      </section>
+      <section class="band band-grey">
+        <div class="band-head"><p class="band-eyebrow">Positionnement</p><h2 class="band-title">Le secteur face aux autres secteurs</h2></div>
+      <div class="comparison-card" id="trajet-compCard">
+        <div class="comp-header">
+          <h3 id="trajet-compTitle">Comparaison</h3>
+          <div class="comp-toggle" id="trajet-compToggle">
+            <button class="active" data-mode="chart" aria-label="Afficher en graphique"><i data-lucide="bar-chart-3"></i></button>
+            <button data-mode="table" aria-label="Afficher en tableau"><i data-lucide="list"></i></button>
+          </div>
+        </div>
+        <div class="chart-wrap" id="trajet-compWrap" style="height:320px"><canvas id="trajet-compChart"></canvas></div>
+        <div class="comp-table-wrap" id="trajet-compTable"></div>
+      </div>
+      <div class="position-card" id="trajet-positionCard">
+        <h3 id="trajet-posTitle">Positionnement IF</h3>
+        <div class="pos-strip-wrap" id="trajet-posStrip"></div>
+      </div>
+      </section>
+      <section class="band">
+        <div class="band-head"><p class="band-eyebrow">Gravité</p><h2 class="band-title">Gravité des accidents de trajet</h2></div>
+      <div class="charts-row charts-row-single">
+        <div class="chart-card">
+          <h3>Cascade de sévérité</h3>
+          <div id="trajet-funnelWrap"></div>
+        </div>
+      </div>
+      </section>
+      <section class="band band-grey" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Population</p><h2 class="band-title">Qui est touché</h2></div>
+      <div class="demo-section" id="trajet-demoSection" style="display:none">
+        <h3 class="evo-title">Démographie des accidents de trajet</h3>
+        <p class="injury-sub">Part des accidents de trajet du secteur selon le sexe et l'âge de la victime. La durée de leurs arrêts se lit dans la bande Arrêts. La barre pâle est la part nationale, en rouge ce qui la dépasse d'au moins 10 %.</p>
+        <div class="demo-grid">
+          <div class="demo-card"><div class="demo-chart-wrap"><canvas id="trajet-demoSex"></canvas></div></div>
+          <div class="demo-card"><div class="demo-chart-wrap"><canvas id="trajet-demoAge"></canvas></div></div>
+        </div>
+      </div>
+      </section>
+      <section class="band" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Mécanismes</p><h2 class="band-title">Comment l'accident de trajet survient</h2></div>
+      <div class="nature-row">
+        <div class="injury-section" id="trajet-siegeSection" style="display:none">
+          <h3 class="evo-title">Siège des lésions</h3>
+          <p class="injury-sub" id="trajet-siegeSub"></p>
+          <div class="bf-grid" id="trajet-siegeGrid"></div>
+        </div>
+        <div class="injury-section" id="trajet-causesSection" style="display:none">
+          <h3 class="evo-title">Causes des accidents de trajet</h3>
+          <p class="injury-sub">Comment l'accident survient, puis le véhicule en cause quand le conducteur en perd le contrôle. Part des accidents de trajet du secteur.</p>
+          <div class="injury-grid"></div>
+        </div>
+      </div>
+      <div class="injury-section" id="trajet-circSection" style="display:none">
+        <h3 class="evo-title">Circonstances détaillées</h3>
+        <p class="injury-sub">Ce qui a dérapé, et avec quoi. Part des accidents de trajet du secteur, huit premières modalités, valeurs non précisées exclues. La barre pâle est la part nationale, en rouge ce qui la dépasse d'au moins 10 %.</p>
+        <div class="injury-grid"></div>
+      </div>
+      </section>
+      <section class="band band-tint" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Arrêts</p><h2 class="band-title">Combien de jours coûte chaque accident de trajet</h2></div>
+      <div class="injury-section" id="trajet-severitySection" style="display:none">
+        <p class="injury-sub">Nombre moyen de journées d'arrêt pour un sinistre, selon ses caractéristiques. Seules comptent les modalités qui pèsent au moins 2 % des sinistres du secteur. Le trait vertical marque le national, en rouge ce qui le dépasse d'au moins 10 %.</p>
+        <div class="injury-grid"></div>
+      </div>
+      </section>
+      <section class="band" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Absence</p><h2 class="band-title">L'absence liée au travail</h2></div>
+        <div class="injury-section" id="trajet-absenceSection" style="display:none">
+          <p class="absence-headline" id="trajet-absenceHeadline"></p>
+          <div class="absence-wrap"><canvas id="trajet-absenceChart"></canvas></div>
+          <p class="injury-sub" id="trajet-absenceNote"></p>
+        </div>
+      </section>
+      <section class="band band-grey" data-collapse>
+        <div class="band-head"><p class="band-eyebrow">Tendance</p><h2 class="band-title">Dix ans d'évolution</h2></div>
+      <div class="evo-section" id="trajet-trendSection" style="display:none">
+        <p class="injury-sub" id="trajet-trendSub"></p>
+        <div class="evo-grid" id="trajet-trendGrid"></div>
+      </div>
+      </section>
+    </div>
+
+    <!-- Carte régionale Trajet -->
+    <section class="band" data-map>
+      <div class="band-head"><p class="band-eyebrow">Territoire</p><h2 class="band-title">Sinistralité par caisse régionale</h2></div>
+    <div class="map-section" id="trajet-mapSection" data-follows-sector>
+      <p class="map-headline" id="trajet-mapHeadline" aria-live="polite"></p>
+      <div class="map-controls">
+        <span class="year-label">Année</span>
+        <div class="year-pills" id="trajet-yearSelect">
+          <button class="year-pill" data-year="2020">2020</button>
+          <button class="year-pill" data-year="2021">2021</button>
+          <button class="year-pill" data-year="2022">2022</button>
+          <button class="year-pill" data-year="2023">2023</button>
+          <button class="year-pill active" data-year="2024">2024</button>
+        </div>
+        <span class="year-label">Mesure</span>
+        <div class="year-pills" id="trajet-metricSelect">
+          <button class="year-pill active" data-metric="count">Nombre</button>
+          <button class="year-pill" data-metric="if">Indice de fréquence</button>
+        </div>
+      </div>
+      <div class="map-body">
+      <div class="map-wrap">
+        <svg
+          id="france-map-trajet"
+          class="map-svg"
+          viewBox="0 0 667 578"
+          width="100%"
+          role="img"
+          aria-label="Carte de France par caisse régionale - Accidents de Trajet">
+        </svg>
+      </div>
+      <div class="map-ranking" id="trajet-mapRanking">
+        <div class="ranking-header">
+          <span class="ranking-title">Classement</span>
+          <button class="ranking-sort-btn" id="trajet-sortBtn" title="Inverser l'ordre" aria-label="Inverser l'ordre du classement">&#x25BC;</button>
+        </div>
+        <ol class="ranking-list" id="trajet-rankingList"></ol>
+      </div>
+      </div>
+      <div class="map-legend" id="trajet-mapLegend" aria-label="Légende de la carte Trajet"></div>
+      <p class="map-note" id="trajet-mapNote">La carte porte sur les accidents de trajet de tous les secteurs d'activité, par caisse. Choisissez un secteur pour voir où travaillent ses salariés. Elle couvre les 21 caisses, les cinq caisses ultramarines dans les encarts de gauche.</p>
+    </div>
+    </section>
+  </div>
+
+  <!-- HOME VIEW : l'accueil de l'outil, où mène le logo (home.js) -->
+  <div class="view" id="view-home">
+    <section class="band band-tint home-hero">
+      <div class="home-hero-head">
+        <div>
+          <h2 class="home-title">Bienvenue dans l'outil Sinistralité AT/MP</h2>
+          <p class="home-sub">Les statistiques officielles de plus de 700 secteurs d'activité, et votre entreprise face à son secteur.</p>
+        </div>
+        <div class="home-actions">
+          <button type="button" class="home-btn home-btn-ghost" id="home-bookmark"><i data-lucide="star"></i>Ajouter aux favoris</button>
+          <a class="home-btn home-btn-primary" href="autodiagnostic/">Situer mon entreprise</a>
+          <div class="home-bookmark-tip" id="home-bookmarkTip" role="status" hidden></div>
+        </div>
+      </div>
+      <div class="home-tiles" id="home-tiles"></div>
+      <div class="fs home-steps" id="home-steps" role="region" aria-label="Premiers pas" hidden></div>
+    </section>
+    <section class="band" id="home-reportsBand" hidden>
+      <h3 class="home-section-title">Vos rapports</h3>
+      <p class="home-reports-note">Gardés sur cet appareil. Rouvrez-en un pour le télécharger en PDF ou le partager.</p>
+      <div class="home-reports" id="home-reports"></div>
+    </section>
+    <section class="band">
+      <h3 class="home-section-title">À découvrir</h3>
+      <div class="home-discover" id="home-discover"></div>
+    </section>
+    <section class="band band-grey">
+      <div class="home-contact">
+        <div>
+          <h3 class="home-section-title">Une question sur votre sinistralité&nbsp;?</h3>
+          <p>Nos consultants AT/MP vous aident à lire vos chiffres et ceux de votre secteur.</p>
+        </div>
+        <a class="home-btn home-btn-primary" href="https://www.ayming.fr/contactez-nous/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=accueil" target="_blank" rel="noopener">Échanger avec un consultant</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- COMPARE VIEW : « Mon entreprise », l'autodiagnostic -->
+  <div class="view" id="view-compare">
+    <section class="band band-tint bench-hero">
+      <div class="bench-hero-head">
+        <span class="bench-chip-brand">Autodiagnostic AT/MP gratuit</span>
+        <h2 class="bench-hero-title">Situez votre sinistralité face à <span class="bench-grad-text">votre secteur</span></h2>
+        <p class="bench-hero-sub">En quatre chiffres, comparez vos accidents du travail aux entreprises de votre activité et estimez votre cotisation AT/MP, à partir des statistiques officielles de votre secteur.</p>
+      </div>
+
+      <div class="bench-hero-grid">
+        <section class="bench-form" aria-label="Vos informations">
+          <h3 class="bench-form-title">Vos chiffres</h3>
+          <div class="bench-pane" id="bench-step1">
+            <div class="bench-sector" id="bench-sectorBlock">
+              <label class="bench-label" for="bench-sectorInput">Secteur d'activité</label>
+              <div class="search-wrapper bench-search" id="bench-sectorSearch">
+                <input type="text" id="bench-sectorInput" placeholder="Votre métier ou code NAF, ex. maçonnerie, 4120A" autocomplete="off">
+                <div class="autocomplete" id="bench-autocomplete"></div>
+              </div>
+              <div class="bench-sector-chip" id="bench-sectorChip"></div>
+            </div>
+
+            <div class="bench-fields">
+              <div class="bench-field">
+                <label for="bench-effectif">Effectif salarié</label>
+                <input type="text" id="bench-effectif" inputmode="numeric" placeholder="ex. 120" autocomplete="off">
+              </div>
+              <div class="bench-field">
+                <label for="bench-accidents">Accidents du travail reconnus avec arrêt, sur l'année</label>
+                <input type="text" id="bench-accidents" inputmode="numeric" placeholder="ex. 9" autocomplete="off">
+                <span class="bench-field-hint">Ceux que la caisse a pris en charge avec un arrêt indemnisé, tels qu'ils figurent sur votre compte AT/MP. Hors trajet. C'est ce que compte le chiffre du secteur.</span>
+              </div>
+              <div class="bench-field">
+                <label for="bench-masse">Masse salariale annuelle (€)</label>
+                <input type="text" id="bench-masse" inputmode="numeric" placeholder="ex. 4 800 000" autocomplete="off">
+                <span class="bench-field-hint">Salaires bruts soumis à cotisations, dans votre DSN.</span>
+              </div>
+            </div>
+            <button type="button" class="bench-reset-link" id="bench-reset">Réinitialiser</button>
+          </div>
+
+        </section>
+
+        <section class="bench-result" id="bench-results" aria-live="polite" aria-label="Votre position"></section>
+      </div>
+    </section>
+
+    <section class="band bench-explain" aria-labelledby="bench-explainTitle">
+      <h3 class="bench-section-title" id="bench-explainTitle">Ce qui compose votre autodiagnostic</h3>
+      <p class="bench-section-sub">Le calcul se fait dans votre navigateur, à partir des statistiques officielles de votre code NAF pour l'année 2024.</p>
+      <div class="bench-explain-grid">
+        <article>
+          <h4>Indice de fréquence</h4>
+          <p>Vos accidents avec arrêt ramenés à 1 000 salariés. Le secteur est calculé de la même façon, sur les accidents ayant donné lieu à un premier règlement, la définition retenue par l'Assurance Maladie.</p>
+        </article>
+        <article>
+          <h4>Durée des arrêts</h4>
+          <p>Les jours d'arrêt par accident et la part des arrêts de plus de 45 jours. Au-delà de 45 jours, un accident change de catégorie de coût moyen et pèse davantage sur votre taux.</p>
+        </article>
+        <article>
+          <h4>Cotisation AT/MP</h4>
+          <p>La valeur du risque est calculée avec le barème officiel des coûts moyens et les majorations nationales, puis rapportée à votre masse salariale. Votre taux notifié permet de vérifier l'écart.</p>
+        </article>
+        <article>
+          <h4>Établissements de même taille</h4>
+          <p>Dans un même secteur, la fréquence varie avec la taille de l'établissement. Nous comparons aussi votre entreprise aux établissements de votre tranche d'effectif.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="band band-grey bench-factors" aria-labelledby="bench-factorsTitle">
+      <div class="bench-factors-intro">
+        <h3 class="bench-section-title" id="bench-factorsTitle">Au-delà des AT/MP, d'autres leviers sur vos coûts RH</h3>
+        <p>Votre sinistralité n'est qu'une partie de vos coûts sociaux. Nos consultants accompagnent aussi ces postes, avec la même méthode.</p>
+        <a class="bench-arrow-link" href="https://go.ayming.com/offres-performance-rh" target="_blank" rel="noopener">Découvrir nos offres RH <i data-lucide="arrow-right"></i></a>
+      </div>
+      <ul class="bench-factors-list">
+        <li><i data-lucide="check"></i><span>Les indemnités journalières avancées en subrogation et jamais remboursées par la CPAM. <a href="https://www.ayming.fr/ressources-humaines/arrets-de-travail/recuperer-les-ij/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=recuperer-ij" target="_blank" rel="noopener">Récupérer les IJ</a></span></li>
+        <li><i data-lucide="check"></i><span>Le suivi des remboursements IJSS et prévoyance, dossier par dossier. <a href="https://www.ayming.fr/ressources-humaines/arrets-de-travail/remboursements-ijss-et-prevoyance/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=remboursements-ijss" target="_blank" rel="noopener">Remboursements IJSS</a></span></li>
+        <li><i data-lucide="check"></i><span>La collecte des arrêts de travail, pour une paie juste dès la clôture. <a href="https://www.ayming.fr/ressources-humaines/arrets-de-travail/collecter-les-arrets-de-travail/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=collecte-arrets" target="_blank" rel="noopener">Collecte des arrêts</a></span></li>
+        <li><i data-lucide="check"></i><span>Les visites médicales, dont la visite de reprise après un arrêt long. <a href="https://www.ayming.fr/ressources-humaines/prevention-et-sante-au-travail/externaliser-visites-medicales/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=visites-medicales" target="_blank" rel="noopener">Visites médicales</a></span></li>
+        <li><i data-lucide="check"></i><span>Les charges sociales payées en trop sur les exercices passés. <a href="https://www.ayming.fr/ressources-humaines/couts-rh/charges-sociales/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=charges-sociales" target="_blank" rel="noopener">Charges sociales</a></span></li>
+        <li><i data-lucide="check"></i><span>Un contrôle URSSAF préparé avant, pendant et après la visite. <a href="https://www.ayming.fr/ressources-humaines/couts-rh/controle-urssaf/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=controle-urssaf" target="_blank" rel="noopener">Contrôle URSSAF</a></span></li>
+        <li><i data-lucide="check"></i><span>Les aides à l'embauche d'alternants restées bloquées. <a href="https://www.ayming.fr/ressources-humaines/couts-rh/aides-apprentissage/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=aides-apprentissage" target="_blank" rel="noopener">Aides à l'apprentissage</a></span></li>
+      </ul>
+    </section>
+
+    <section class="band bench-faq" aria-labelledby="bench-faqTitle">
+      <h3 class="bench-section-title" id="bench-faqTitle">Vos questions sur l'autodiagnostic</h3>
+      <details>
+        <summary>D'où viennent les chiffres de mon secteur&nbsp;?</summary>
+        <p>Des statistiques AT/MP de l'Assurance Maladie, publiées par code NAF pour l'année 2024. Ce sont les mêmes chiffres que ceux du site data.ameli.fr, auxquels nous ajoutons le détail des fiches sectorielles (causes, siège des lésions, taille des établissements).</p>
+      </details>
+      <details>
+        <summary>Comment est calculé l'indice de fréquence&nbsp;?</summary>
+        <p>Nombre d'accidents du travail avec arrêt, divisé par l'effectif salarié, multiplié par 1 000. Pour le secteur, l'Assurance Maladie compte les accidents ayant donné lieu à un premier règlement d'indemnités, soit ceux qui ont entraîné un arrêt.</p>
+      </details>
+      <details>
+        <summary>Indice de fréquence, taux de fréquence, taux de gravité, quelle différence&nbsp;?</summary>
+        <p>L'indice de fréquence rapporte les accidents avec arrêt à l'effectif, pour 1&nbsp;000 salariés. C'est l'indicateur que publie l'Assurance Maladie par secteur, et celui de cet outil. Le taux de fréquence rapporte les mêmes accidents aux heures travaillées, pour un million d'heures, et le taux de gravité compte les journées perdues pour 1&nbsp;000 heures travaillées. Votre bilan social ou votre service sécurité suivent souvent ces deux taux, qui ne se comparent pas directement à l'indice. Aucun des trois ne se compare non plus à un LTIFR international, calculé sur d'autres bases d'heures et avec une définition de l'arrêt propre à chaque pays ou groupe.</p>
+      </details>
+      <details>
+        <summary>Mon taux notifié est différent de l'estimation, est-ce normal&nbsp;?</summary>
+        <p>Oui, dans une certaine mesure. L'estimation part du barème des coûts moyens de votre comité technique national et de la sinistralité que vous saisissez. Votre taux réel dépend de votre code risque, de vos trois dernières années et de votre mode de tarification. Un écart important mérite une vérification de votre compte employeur, un taux pouvant être contesté dans les deux mois suivant sa notification.</p>
+      </details>
+      <details>
+        <summary>Mes données sont-elles enregistrées&nbsp;?</summary>
+        <p>Le calcul se fait dans votre navigateur et rien n'est envoyé tant que vous ne demandez pas votre diagnostic. Si vous le demandez, vos coordonnées, votre secteur, vos chiffres et vos réponses sont transmis à Ayming, qui vous recontacte au sujet de ce diagnostic. Votre navigateur garde seulement, sur votre appareil, le prénom, le secteur et la raison de votre visite donnés à l'accueil (votre carte ne part que si vous la partagez vous-même), les réponses de vos rapports pour les rouvrir depuis l'accueil, votre choix de thème, le menu replié ou ouvert, le message fermé dans le menu et le fait que l'accueil et les visites guidées ont déjà été vus, votre progression dans les premiers pas, sans rien transmettre.</p>
+      </details>
+      <details>
+        <summary>Pourquoi mon entreprise de moins de 20 salariés a-t-elle peu de leviers sur son taux&nbsp;?</summary>
+        <p>En dessous de 20 salariés, le taux est collectif et fixé pour tout le secteur. Entre 20 et 149 salariés, une part du taux dépend de votre propre sinistralité, et à partir de 150 salariés le taux est individuel. La prévention agit dans tous les cas sur vos absences et leur coût indirect.</p>
+      </details>
+    </section>
+
+    <section class="band band-navy bench-cta" aria-labelledby="bench-ctaTitle">
+      <div>
+        <h3 id="bench-ctaTitle">Prêt à maîtriser vos AT/MP ?</h3>
+        <p>Échangez avec l'un de nos consultants. Ensemble, nous examinons votre compte employeur, vos taux notifiés et vos arrêts longs, puis nous chiffrons vos leviers.</p>
+      </div>
+      <a class="bench-cta-btn" href="https://www.ayming.fr/contactez-nous/?utm_source=sinistralite&amp;utm_medium=referral&amp;utm_campaign=autodiagnostic" target="_blank" rel="noopener">Échanger avec un consultant</a>
+    </section>
+  </div>
+
+  <!-- DIAGNOSTIC VIEW : parcours question par question, puis le rapport imprimable en PDF -->
+  <div class="view" id="view-diagnostic">
+    <div class="diag-shell" id="diag-shell"></div>
+  </div>
+
+  <dialog class="welcome" id="welcomeDialog" aria-labelledby="welcomeQ0">
+    <div class="welcome-head">
+      <span class="welcome-brand"><img src="assets/ayming-logo.png" alt="Ayming" width="70" height="28"><span>Sinistralité AT/MP</span></span>
+      <button type="button" class="welcome-x" id="welcomeClose" aria-label="Fermer">&times;</button>
+    </div>
+    <div class="welcome-grid">
+      <div class="welcome-art">
+        <div id="welcomeTag"></div>
+      </div>
+      <div class="welcome-main">
+        <section class="welcome-step" data-step="0">
+          <p class="welcome-eyebrow">Bienvenue</p>
+          <h2 class="welcome-q" id="welcomeQ0">Comment dois-je vous appeler&nbsp;?</h2>
+          <p class="welcome-why">Pour personnaliser votre espace.</p>
+          <input type="text" class="welcome-input" id="welcomeName" placeholder="Votre prénom" autocomplete="given-name" maxlength="40" aria-labelledby="welcomeQ0">
+          <div class="welcome-actions">
+            <button type="button" class="welcome-btn welcome-btn-primary" data-welcome-next>Continuer</button>
+            <button type="button" class="welcome-btn welcome-btn-text" data-welcome-skip>Passer</button>
+          </div>
+        </section>
+        <section class="welcome-step" data-step="1" hidden>
+          <p class="welcome-eyebrow" id="welcomeHi"></p>
+          <h2 class="welcome-q" id="welcomeQ1">Quel est votre secteur&nbsp;?</h2>
+          <p class="welcome-why">Pour ouvrir l'outil sur les chiffres de votre secteur.</p>
+          <div class="welcome-search">
+            <input type="text" class="welcome-input" id="welcomeSector" placeholder="Votre métier ou code NAF, ex. maçonnerie, 4120A" autocomplete="off" aria-labelledby="welcomeQ1">
+            <div class="autocomplete" id="welcomeSectorAc"></div>
+          </div>
+          <div class="welcome-actions">
+            <button type="button" class="welcome-btn welcome-btn-primary" data-welcome-next>Continuer</button>
+            <button type="button" class="welcome-btn welcome-btn-text" data-welcome-skip>Passer</button>
+          </div>
+        </section>
+        <section class="welcome-step" data-step="2" hidden>
+          <p class="welcome-eyebrow">Dernière question</p>
+          <h2 class="welcome-q" id="welcomeQ2">Qu'est-ce qui vous amène aujourd'hui&nbsp;?</h2>
+          <p class="welcome-why">Pour préparer votre rapport et votre carte.</p>
+          <div class="welcome-choices" id="welcomeMotifs" role="group" aria-labelledby="welcomeQ2"></div>
+          <div class="welcome-actions">
+            <button type="button" class="welcome-btn welcome-btn-text" data-welcome-skip>Passer</button>
+          </div>
+        </section>
+        <section class="welcome-step" data-step="3" hidden>
+          <h2 class="welcome-q" id="welcomeTitle">Bienvenue dans l'outil Sinistralité AT/MP</h2>
+          <p class="welcome-lead">Les statistiques officielles de plus de 700 secteurs d'activité, et votre entreprise face à son secteur.</p>
+          <ul class="welcome-features">
+            <li><span class="welcome-ico"><i data-lucide="building-2"></i></span><strong>Situez votre entreprise</strong></li>
+            <li><span class="welcome-ico"><i data-lucide="hard-hat"></i></span><strong>Explorez votre secteur</strong></li>
+            <li><span class="welcome-ico"><i data-lucide="file-text"></i></span><strong>Recevez votre rapport</strong></li>
+          </ul>
+          <p class="welcome-unlock"><i data-lucide="star"></i>Terminez vos premiers pas, une carte à votre nom vous attend.</p>
+          <div class="welcome-actions">
+            <button type="button" class="welcome-btn welcome-btn-text" id="welcomeSkip">Je découvre par moi-même</button>
+            <button type="button" class="welcome-btn welcome-btn-primary" id="welcomeTour">Montrez-moi comment ça marche</button>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="welcome-dots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  </dialog>
+  <dialog class="peer-share" id="peerShare" aria-labelledby="peerShareTitle">
+    <button type="button" class="welcome-x" id="peerShareClose" aria-label="Fermer">&times;</button>
+    <h2 id="peerShareTitle">Invitez vos pairs à faire le leur</h2>
+    <p class="peer-share-lead">Votre rapport reste chez vous. Le lien invite chacun à faire son propre diagnostic, gratuit, sur le même secteur.</p>
+    <label class="peer-share-label" for="peerShareText">Votre message, à modifier si vous le souhaitez</label>
+    <textarea id="peerShareText" rows="8"></textarea>
+    <p class="peer-share-url" id="peerShareLink"></p>
+    <div class="peer-share-actions">
+      <button type="button" class="peer-share-btn" id="peerShareMail"><i data-lucide="mail"></i>Par e-mail</button>
+      <button type="button" class="peer-share-btn" id="peerShareLinkedin"><i data-lucide="linkedin"></i>Sur LinkedIn</button>
+      <button type="button" class="peer-share-btn" id="peerShareCopy"><i data-lucide="copy"></i>Copier</button>
+    </div>
+    <p class="peer-share-status" id="peerShareStatus" role="status"></p>
+  </dialog>
+  <dialog class="badge-dialog" id="badgeDialog" aria-labelledby="badgeTitle">
+    <div class="badge-side">
+      <h2 id="badgeTitle">Bravo&nbsp;!</h2>
+      <p>Vous savez maintenant où se situe votre entreprise face à son secteur, ce que coûtent ses accidents et par où commencer.</p>
+      <p>Voici votre carte. Partagez-la, vos pairs pourront situer leur propre secteur en deux minutes.</p>
+      <label class="badge-name" id="badgeNameField" hidden>Votre prénom, pour la carte
+        <input type="text" class="welcome-input" id="badgeName" autocomplete="given-name" maxlength="40">
+      </label>
+      <button type="button" class="welcome-btn welcome-btn-primary badge-close" id="badgeClose">Continuer</button>
+    </div>
+    <div class="badge-stage">
+      <div id="badgeTag"></div>
+      <div class="name-tag-actions">
+        <button type="button" class="name-tag-btn" id="badgeLinkedin" aria-label="Partager sur LinkedIn" title="Partager sur LinkedIn"><i data-lucide="linkedin"></i></button>
+        <button type="button" class="name-tag-btn" id="badgeDownload" aria-label="Télécharger l'image" title="Télécharger l'image"><i data-lucide="download"></i></button>
+        <button type="button" class="name-tag-btn" id="badgeCopy" aria-label="Copier l'image" title="Copier l'image"><i data-lucide="copy"></i></button>
+      </div>
+      <p class="name-tag-status" id="badgeStatus" role="status"></p>
+    </div>
+  </dialog>
+
+<footer>
+    <span id="footerSource">Sources : Assurance Maladie, statistiques AT/MP 2024 (<a href="https://www.assurance-maladie.ameli.fr/etudes-et-donnees/indicateurs-accidents-travail-ctn-code-naf" target="_blank" rel="noopener">séries CTN × NAF</a>, <a href="https://www.assurance-maladie.ameli.fr/etudes-et-donnees/par-theme/risques-professionnels-et-sinistralite/moteur-recherche-code-ape-naf" target="_blank" rel="noopener">fiches sectorielles</a>, <a href="https://data.ameli.fr/pages/data-risques-professionnels/" target="_blank" rel="noopener">open data</a>)</span>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
+</div>
+
+<!-- Shared drawers (outside .container to avoid stacking context) -->
+<!-- Assistant Virginie : lanceur flottant (photo, halo, pastille). Contextuel au secteur. -->
+<div class="va-launcher" id="assistantLauncher" style="display:none">
+  <div class="va-teaser" id="assistantTeaser" hidden>
+    <button class="va-teaser-x" id="assistantTeaserX" type="button" aria-label="Masquer">&times;</button>
+    <span class="va-teaser-name"><i data-lucide="sparkles"></i><span>Ayming insights</span></span>
+    Nos consultants AT/MP vous aident à décrypter ce secteur.
+  </div>
+  <button class="va-launch-btn" id="assistantLaunchBtn" type="button" aria-label="Ouvrir l'assistant Virginie">
+    <span class="va-ring"></span>
+    <img src="assets/consultant-brossier.webp" alt="Virginie Brossier">
+    <span class="va-launch-badge" id="assistantLaunchBadge" aria-hidden="true" style="display:none"></span>
+  </button>
+</div>
+
+<!-- Assistant Virginie : panneau de conversation -->
+<div class="va-panel" id="assistantPanel" hidden role="dialog" aria-label="Conversation avec Virginie">
+  <div class="va-head">
+    <img src="assets/consultant-brossier.webp" alt="Virginie Brossier" width="42" height="42">
+    <div class="va-id">
+      <span class="va-name"><span class="va-dot"></span>Virginie Brossier</span>
+      <span class="va-role">Chef de projets BPO &middot; Expertise AT/MP</span>
+    </div>
+    <button class="va-x" id="assistantClose" type="button" aria-label="Fermer">&times;</button>
+  </div>
+  <div class="va-body" id="assistantBody" aria-live="polite"></div>
+  <div class="va-foot" id="assistantFoot" hidden></div>
+</div>
+
+<div class="share-drawer" id="shareDrawer" role="dialog" aria-modal="true" aria-label="Partager">
+  <div class="share-drawer-header">
+    <span class="drawer-icon"><i data-lucide="share-2"></i></span>
+    <h3>Partager</h3>
+    <button class="close-btn" id="shareCloseBtn" aria-label="Fermer le partage" title="Fermer">&times;</button>
+  </div>
+  <div class="share-drawer-body">
+    <button class="share-option" id="copyLinkBtn">
+      <span class="share-option-icon">&#x1F517;</span>
+      <span class="share-option-label">Copier le lien</span>
+      <span class="share-option-arrow">&#x203A;</span>
+    </button>
+  </div>
+</div>
+
+<nav class="bottom-nav" id="bottomNav" aria-label="Navigation mobile">
+  <button class="nav-item bottom-nav-item" data-view="home" aria-label="Accueil">
+    <span class="nav-icon-wrap"><i data-lucide="house"></i></span>
+    <span class="bottom-nav-label">Accueil</span>
+  </button>
+  <button class="nav-item bottom-nav-item" data-view="compare" aria-label="Mon entreprise">
+    <span class="nav-icon-wrap"><i data-lucide="building-2"></i></span>
+    <span class="bottom-nav-label">Entreprise</span>
+  </button>
+  <button class="nav-item bottom-nav-item active" data-view="at" aria-label="Accidents du Travail">
+    <span class="nav-icon-wrap"><i data-lucide="hard-hat"></i></span>
+    <span class="bottom-nav-label">AT</span>
+  </button>
+  <button class="nav-item bottom-nav-item" data-view="mp" aria-label="Maladies Professionnelles">
+    <span class="nav-icon-wrap"><i data-lucide="thermometer"></i></span>
+    <span class="bottom-nav-label">MP</span>
+  </button>
+  <button class="nav-item bottom-nav-item" data-view="trajet" aria-label="Accidents de Trajet">
+    <span class="nav-icon-wrap"><i data-lucide="car"></i></span>
+    <span class="bottom-nav-label">Trajet</span>
+  </button>
+</nav>
+
+<div class="map-tooltip" id="mapTooltip" aria-hidden="true"></div>
+
+<div class="map-tap-panel" id="mapTapPanel" aria-live="polite" aria-label="Informations caisse régionale">
+  <div class="tap-panel-handle" aria-hidden="true"></div>
+  <button class="tap-panel-close" aria-label="Fermer">&times;</button>
+  <span class="tap-panel-name"></span>
+  <span class="tap-panel-metric"></span>
+  <span class="tap-panel-val"></span>
+</div>
+
+<script type="module" src="js/map.js?v=f8b7846"></script>
+<script type="module" src="js/app.js?v=f8b7846"></script>
+</body>
+</html>

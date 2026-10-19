@@ -1,0 +1,145 @@
+/* ── Accueil de l'outil (#view-home, home.js) ── */
+/* Les jetons --ay-* sont déclarés dans compare.css, pour Mon entreprise et l'accueil. */
+
+#view-home [hidden] { display: none !important; }
+
+.home-hero {
+  padding-top: var(--space-12); padding-bottom: var(--space-12);
+  background: linear-gradient(180deg, var(--ay-blue-wash) 0%, var(--band-white) 100%);
+  border-bottom: 1px solid var(--border-light);
+}
+.home-hero-head {
+  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+  gap: var(--space-6); margin-bottom: var(--space-8);
+}
+.home-title { margin: 0 0 var(--space-2); font-size: 2rem; font-weight: var(--weight-bold); line-height: 1.2; color: var(--ay-heading); }
+.home-sub { margin: 0; max-width: 620px; font-size: 1.0625rem; line-height: 1.6; color: var(--ay-body); }
+
+.home-actions { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.home-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-height: 44px; padding: 0 var(--space-5); border-radius: 30px; cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-size: var(--text-sm); font-weight: var(--weight-bold); text-decoration: none;
+  transition: transform var(--dur-press) var(--ease-out), box-shadow 0.15s;
+}
+.home-btn:active { transform: scale(0.97); }
+.home-btn svg { width: 16px; height: 16px; }
+.home-btn-primary { border: none; background: var(--ay-grad); color: #fff; box-shadow: var(--ay-shadow-md); }
+.home-btn-primary:hover { box-shadow: var(--ay-shadow-lg); }
+.home-btn-ghost { border: 1px solid var(--ay-border); background: var(--bg-elevated); color: var(--ay-heading); }
+.home-btn-ghost:hover { border-color: var(--ay-blue); color: var(--ay-mid); }
+
+/* La carte des favoris flotte sous le bouton, sans décaler la page (home.js). */
+.home-bookmark-tip {
+  position: absolute; top: calc(100% + 10px); left: 0; z-index: 20; display: flex; align-items: center; gap: var(--space-3);
+  width: 300px; max-width: calc(100vw - 32px); padding: var(--space-4); border: 1px solid var(--ay-border); border-radius: 14px;
+  background: var(--bg-elevated); box-shadow: var(--ay-shadow-lg); text-align: left;
+}
+.home-bookmark-tip::before {
+  content: ''; position: absolute; top: -7px; left: 28px; width: 12px; height: 12px; transform: rotate(45deg);
+  background: var(--bg-elevated); border-left: 1px solid var(--ay-border); border-top: 1px solid var(--ay-border);
+}
+.home-bookmark-tip.is-in { animation: bm-in 0.28s var(--ease-out); }
+.bm-star {
+  flex: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(245, 180, 0, 0.14); color: #e0a400;
+}
+.bm-star svg { width: 24px; height: 24px; fill: #f5b400; stroke: #e0a400; }
+.is-in .bm-star svg { animation: bm-pop 0.6s 0.15s var(--ease-out) both; }
+.bm-text { display: flex; flex-direction: column; gap: 6px; font-size: var(--text-sm); color: var(--ay-body); }
+.bm-text strong { color: var(--ay-heading); }
+.bm-keys { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.bm-keys kbd {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 28px; padding: 0 8px;
+  border: 1px solid var(--ay-border); border-bottom-width: 3px; border-radius: 7px; background: var(--ay-panel);
+  font-family: var(--sans); font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--ay-heading);
+}
+.is-in .bm-keys kbd { animation: bm-press 1.6s 0.7s ease-in-out 2; }
+@keyframes bm-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes bm-pop { 0% { transform: scale(0.3) rotate(-30deg); } 60% { transform: scale(1.25) rotate(8deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes bm-press { 0%, 40%, 100% { transform: none; border-bottom-width: 3px; } 20% { transform: translateY(2px); border-bottom-width: 1px; } }
+@media (prefers-reduced-motion: reduce) {
+  .home-bookmark-tip.is-in, .is-in .bm-star svg, .is-in .bm-keys kbd { animation: none; }
+}
+
+/* Mon entreprise, puis les trois onglets de données : le texte en haut, l'illustration en bas, à parts égales */
+.home-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+.home-tile {
+  display: grid; grid-template-rows: 1fr 1fr; min-width: 0; min-height: 380px; overflow: hidden;
+  border: 1px solid var(--ay-border); border-radius: 16px;
+  background: var(--bg-elevated); color: var(--ay-body); text-decoration: none; text-align: left;
+  box-shadow: var(--ay-shadow-md); transition: transform 0.15s var(--ease-out), box-shadow 0.15s;
+}
+.home-tile:hover { transform: translateY(-2px); box-shadow: var(--ay-shadow-lg); }
+.home-tile-main { background: var(--ay-grad-dark); border-color: transparent; color: rgba(255, 255, 255, 0.88); }
+.home-tile-body { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5); }
+.home-tile-title { font-size: 1.125rem; font-weight: var(--weight-bold); color: var(--ay-heading); }
+.home-tile-main .home-tile-title { color: #fff; }
+.home-tile-text { font-size: var(--text-sm); line-height: 1.5; }
+.home-tile-go { margin-top: auto; padding-top: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--ay-mid); }
+.home-tile-main .home-tile-go { color: #fff; }
+
+.home-tile-ill {
+  position: relative; display: block; min-height: 180px; overflow: hidden;
+  background: color-mix(in srgb, var(--ay-blue) 9%, var(--bg-elevated));
+}
+.home-tile-main .home-tile-ill { background: rgba(255, 255, 255, 0.12); }
+
+/* La maquette (styles/mockup.css) dépasse du bas de la tuile, comme chez Microsoft 365. */
+.home-tile-ill .mk-window { position: absolute; top: 18px; left: 16px; right: -12px; bottom: -14px; border-radius: 10px 10px 0 0; }
+.home-tile:hover .mk-window { transform: translateY(-4px); }
+@media (prefers-reduced-motion: reduce) {
+  .home-tile:hover .mk-window { transform: none; }
+}
+
+/* À découvrir : le contenu mis en avant, puis les ressources */
+.home-section-title { margin: 0 0 var(--space-4); font-size: 1.25rem; font-weight: var(--weight-bold); color: var(--ay-heading); }
+.home-reports-note { margin: calc(-1 * var(--space-2)) 0 var(--space-4); font-size: var(--text-sm); color: var(--text-secondary); }
+.home-reports { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.home-report {
+  display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5); border: 1px solid var(--ay-blue);
+  border-radius: var(--radius-lg, 14px); background: var(--ay-blue-wash);
+}
+.home-report-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: var(--space-2); margin-top: auto; padding-top: var(--space-3); }
+.home-report-actions .home-btn-ghost { gap: 6px; }
+.home-report-actions .home-btn-ghost svg { width: 16px; height: 16px; }
+.home-report-del {
+  margin-left: auto; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; border-radius: 50%;
+  background: transparent; color: var(--text-secondary); cursor: pointer;
+}
+.home-report-del:hover { background: var(--accent-glow); color: var(--accent); }
+.home-report-del svg { width: 16px; height: 16px; }
+@media (max-width: 900px) { .home-reports { grid-template-columns: 1fr; } }
+.home-discover { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.home-card {
+  display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; padding: var(--space-5);
+  border: 1px solid var(--ay-border); border-radius: 14px; background: var(--ay-panel);
+  color: var(--ay-body); text-decoration: none; text-align: left;
+}
+.home-card:hover { border-color: var(--ay-blue); }
+.home-card-featured { background: var(--ay-blue-wash); border-color: var(--ay-blue); }
+.home-card-kind { font-size: 0.6875rem; font-weight: var(--weight-bold); letter-spacing: 0.5px; text-transform: uppercase; color: var(--ay-mid); }
+.home-card-title { font-size: var(--text-base); font-weight: var(--weight-bold); line-height: 1.35; color: var(--ay-heading); }
+.home-card-text { font-size: var(--text-sm); line-height: 1.5; }
+.home-card-go { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; padding-top: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--ay-mid); }
+.home-card-go svg { width: 14px; height: 14px; }
+
+.home-contact { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); }
+.home-contact p { margin: 0; color: var(--ay-body); }
+.home-contact .home-section-title { margin-bottom: var(--space-2); }
+
+/* Les premiers pas vivent dans le menu latéral ; sur mobile, où il n'existe pas, sous les tuiles. */
+.home-steps { margin-top: var(--space-6); }
+@media (min-width: 769px) {
+  .home-steps { display: none !important; }
+}
+
+@media (max-width: 1024px) {
+  .home-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-discover { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .home-title { font-size: 1.6rem; }
+  .home-tiles, .home-discover { grid-template-columns: 1fr; }
+  .home-actions, .home-btn { width: 100%; }
+}

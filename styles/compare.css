@@ -1,0 +1,97 @@
+/* ── Mon entreprise : autodiagnostic, habillé aux couleurs Ayming ──
+   Charte : ~/projects/ayming/DESIGN.md. Surfaces blanches et aérées, bleu #00AEEF comme
+   seul accent, titres bleu nuit #004A76, dégradé bleu vers vert réservé aux temps forts,
+   Lato jusqu'à 700. L'en-tête commun des vues est masqué, la page porte son propre titre. */
+
+body[data-view="compare"] .container > header, body[data-view="home"] .container > header { display: none; }
+
+/* Les jetons Ayming, déclarés une fois pour « Mon entreprise », le diagnostic qui la prolonge et l'accueil. */
+#view-compare, #view-diagnostic, #view-home {
+  --ay-blue: #00AEEF;
+  --ay-blue-soft: rgba(0, 174, 239, 0.10);
+  --ay-blue-wash: #F4FBFF;
+  --ay-navy: #004A76;
+  --ay-mid: #0072B6;
+  --ay-red: #DC533A;
+  --ay-green-text: #068367;
+  --ay-grad: linear-gradient(90deg, #00AEEF 0%, #00B08B 100%);
+  --ay-grad-dark: linear-gradient(160deg, #004A76 0%, #278FC9 60%, #00AEEF 100%);
+  --ay-border: #eef2f6;
+  --ay-panel: #f8fafc;
+  --ay-heading: var(--ay-navy);
+  --ay-body: #4A5B68;
+  --ay-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --ay-shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.10);
+  text-align: left;
+}
+#view-compare {
+  color: var(--ay-body);
+}
+[data-theme="dark"] #view-compare, [data-theme="dark"] #view-diagnostic, [data-theme="dark"] #view-home {
+  --ay-heading: var(--text);
+  --ay-body: var(--text-secondary);
+  --ay-blue-wash: color-mix(in srgb, #00AEEF 6%, var(--bg));
+  --ay-border: var(--border);
+  --ay-panel: var(--bg-card);
+  --ay-shadow-md: none;
+  --ay-shadow-lg: none;
+  --ay-green-text: #3fb98f;
+  --ay-red: #e7775f;
+}
+/* Les blocs affichés en flex doivent quand même céder à l'attribut hidden. */
+#view-compare [hidden] { display: none !important; }
+
+.ac-hint { padding: 12px 14px; font-size: var(--text-sm); color: var(--text-dim); line-height: 1.5; }
+
+/* Bouton principal : pilule en dégradé, le temps fort de la page */
+.bench-primary-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 var(--space-6); border: none; border-radius: 30px;
+  background: var(--ay-grad); color: #fff; cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-size: var(--text-base); font-weight: var(--weight-bold);
+  box-shadow: var(--ay-shadow-md);
+  transition: box-shadow 0.15s, transform var(--dur-press) var(--ease-out), opacity 0.15s;
+}
+.bench-primary-btn:hover { box-shadow: var(--ay-shadow-lg); }
+.bench-primary-btn:active { transform: scale(0.97); }
+.bench-primary-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+/* ── FAQ ── */
+.bench-section-title { margin: 0 0 var(--space-3); font-size: 1.875rem; font-weight: var(--weight-bold); color: var(--ay-heading); line-height: 1.2; }
+.bench-faq > .bench-section-title { text-align: center; }
+.bench-faq { --page-w: 820px; }
+.bench-faq > .bench-section-title { margin-bottom: var(--space-6); }
+.bench-faq details { border-bottom: 1px solid var(--ay-border); }
+.bench-faq summary {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--space-4);
+  min-height: var(--tap-min); padding: var(--space-4) 0; cursor: pointer; list-style: none;
+  font-weight: var(--weight-bold); color: var(--ay-heading);
+}
+.bench-faq summary::-webkit-details-marker { display: none; }
+.bench-faq summary::after {
+  content: ''; flex-shrink: 0; width: 8px; height: 8px; margin-right: 4px;
+  border-right: 2px solid var(--ay-blue); border-bottom: 2px solid var(--ay-blue);
+  transform: rotate(45deg); transition: transform var(--dur-pop) var(--ease-out);
+}
+.bench-faq details[open] summary::after { transform: rotate(-135deg); }
+.bench-faq details p { margin: 0 0 var(--space-4); color: var(--ay-body); line-height: 1.6; }
+
+/* ── 5. Appel à un consultant : dégradé bleu nuit du guide ── */
+.bench-cta {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-8);
+  color: #fff; background: var(--ay-grad-dark);
+}
+.bench-cta h3 { margin: 0 0 var(--space-2); font-size: 1.5rem; font-weight: var(--weight-bold); color: #fff; }
+.bench-cta p { margin: 0; max-width: 620px; color: rgba(255,255,255,0.9); line-height: 1.6; }
+.bench-cta-btn {
+  flex-shrink: 0; display: inline-flex; align-items: center; min-height: 48px; padding: 0 var(--space-6);
+  border-radius: 30px; background: #fff; color: var(--ay-navy);
+  font-weight: var(--weight-bold); text-decoration: none; white-space: nowrap;
+  transition: box-shadow 0.15s, transform var(--dur-press) var(--ease-out);
+}
+.bench-cta-btn:hover { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18); }
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .bench-cta { flex-direction: column; align-items: flex-start; }
+}

@@ -1,0 +1,11 @@
+User-agent: LinkedInBot
+User-agent: WhatsApp
+User-agent: TelegramBot
+User-agent: facebookexternalhit
+User-agent: Twitterbot
+User-agent: Slackbot-LinkExpanding
+User-agent: SkypeUriPreview
+Allow: /
+
+User-agent: *
+Disallow: /

@@ -1,0 +1,238 @@
+/* ── Mes badges (badges.js), chargé à la demande ──
+   La salle : des étagères par qualité de préventeur, des cartes à collectionner. Elle s'ouvre comme une vue,
+   à droite du menu latéral, dans le thème de l'outil (clair ou sombre). Seule la carte en main garde son fond sombre. */
+
+/* ── La salle ── */
+.room {
+  position: fixed; inset: 0 0 0 var(--sb-w); z-index: 90; width: auto; max-width: none; height: auto; max-height: none;
+  margin: 0; padding: 0; border: none; overflow: auto; overscroll-behavior: contain;
+  background: var(--band-grey); color: var(--text); transition: left 0.2s var(--ease-out);
+}
+@media screen and (min-width: 769px) and (max-width: 1100px) { .room { left: 72px; } }
+/* Sur téléphone, pas de menu latéral : la salle prend l'écran et garde sa croix. */
+@media (max-width: 768px) { .room { left: 0; z-index: 130; } }
+.room-x {
+  position: fixed; z-index: 5; top: max(16px, env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  display: none; align-items: center; justify-content: center; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: var(--hover-bg); color: var(--text); cursor: pointer;
+}
+@media (max-width: 768px) { .room > .room-x { display: flex; } }
+.room-stage > .room-x { display: flex; background: rgba(255, 255, 255, 0.1); color: #fbfcfd; }
+.room-x:hover { background: var(--border-light); }
+.room-stage > .room-x:hover { background: rgba(255, 255, 255, 0.18); }
+.room-x svg { width: 20px; height: 20px; }
+.room-in { max-width: 1080px; margin: 0 auto; padding: 40px max(16px, env(safe-area-inset-right, 0px)) 72px max(16px, env(safe-area-inset-left, 0px)); }
+.room-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 32px; }
+@media (max-width: 768px) { .room-head { padding-right: 56px; } }
+.room-eyebrow { margin: 0 0 6px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.room-head h2 { margin: 0; font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 900; line-height: 1.05; color: var(--heading); }
+.room-lead { max-width: 52ch; margin: 10px 0 0; font-size: 1rem; line-height: 1.55; color: var(--text-secondary); }
+.room-tally { display: flex; flex-direction: column; gap: 8px; }
+.room-tally-n { font-size: 2.4rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; color: var(--heading); }
+.room-tally-n small { font-size: 1rem; font-weight: 700; color: var(--text-dim); }
+.room-tiers { display: flex; gap: 14px; font-size: 0.8125rem; color: var(--text-secondary); }
+.room-tiers span { display: inline-flex; align-items: center; gap: 6px; }
+.room-dot { width: 10px; height: 10px; border-radius: 50%; }
+.room-dot.is-bronze { background: linear-gradient(145deg, #f6d2ac, #a35c2e); }
+.room-dot.is-argent { background: linear-gradient(145deg, #ffffff, #8794a0); }
+.room-dot.is-or { background: linear-gradient(145deg, #fff1b8, #b8860b); }
+
+.room-shelf { margin-top: 40px; }
+.room-shelf h3 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 18px; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); }
+.room-shelf h3 span { letter-spacing: 0; font-variant-numeric: tabular-nums; color: var(--text-dim); }
+.room-row { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 22px 18px; margin: 0; padding: 0 0 26px; list-style: none; perspective: 2200px; }
+.room-row::after {   /* l'étagère éclairée sur laquelle les cartes tiennent */
+  content: ''; position: absolute; left: -12px; right: -12px; bottom: 0; height: 10px; border-radius: 3px;
+  background: linear-gradient(180deg, var(--bg-card), var(--border-light));
+  box-shadow: inset 0 0 0 1px var(--border-light), 0 12px 22px -10px rgba(0, 40, 70, 0.25);
+}
+@media (max-width: 480px) {
+  .room-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 14px; }
+  .room-head { padding-right: 48px; }
+}
+
+/* ── La carte ── */
+.bc {
+  --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%; --lift: 0px;
+  position: relative; display: block; width: 100%; max-width: 224px; aspect-ratio: 5 / 7; padding: 0; border: 0; background: none;
+  cursor: pointer; container-type: inline-size; transform-style: preserve-3d; font: inherit; color: inherit; text-align: left;
+}
+.bc img { -webkit-user-drag: none; user-select: none; pointer-events: none; }
+.bc.is-bronze { --metal: linear-gradient(135deg, #f8dcbc 0%, #c9844f 30%, #7e421e 55%, #e0a877 78%, #8a4b25 100%); }
+.bc.is-argent { --metal: linear-gradient(135deg, #ffffff 0%, #b9c3cc 28%, #7e8b97 52%, #eef2f5 76%, #8c99a5 100%); }
+.bc.is-or { --metal: linear-gradient(135deg, #fff6c9 0%, #f2c94c 26%, #a8760c 52%, #ffe58a 74%, #b8860b 100%); }
+.bc-in {
+  position: absolute; inset: 0; transform-style: preserve-3d; border-radius: 6.5cqw;
+  transform: translateY(var(--lift)) rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip, 0deg)));
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bc.is-locked { --flip: 180deg; }
+.room-row .bc:hover { --lift: -8px; }
+.bc.is-tilting .bc-in { transition: transform 0.08s linear; }
+.bc:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6.5cqw; }
+.bc-shadow {
+  position: absolute; left: 8%; right: 8%; bottom: -14px; height: 22px; border-radius: 50%;
+  background: rgba(0, 40, 70, 0.3); filter: blur(10px); transition: opacity 0.3s;
+}
+.bc-face {
+  position: absolute; inset: 0; border-radius: 6.5cqw; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: 0 10px 26px rgba(0, 40, 70, 0.22);
+}
+
+/* Le recto : cadre dans le métal de la carte, champ du titre, image, texte, puce de la marque et du numéro. */
+.bc-front { padding: 3.2cqw; background: var(--metal); transform: translateZ(3px); }
+.bc-front-in { position: relative; display: flex; flex-direction: column; height: 100%; padding: 4.4cqw 5cqw; border-radius: 4.5cqw; background: #fbfcfd; color: #004a76; overflow: hidden; }
+.bc-title {
+  position: relative; z-index: 1; display: flex; align-items: center; flex: none; height: 11.5cqw; margin-bottom: 2.4cqw; padding: 0 3cqw;
+  border-radius: 2.2cqw; border: 0.6cqw solid var(--g2); background: linear-gradient(180deg, #ffffff 0%, var(--g1) 100%);
+  box-shadow: 0 0.5cqw 1.2cqw rgba(0, 40, 70, 0.14), inset 0 0.4cqw 0 rgba(255, 255, 255, 0.9);
+}
+.bc-name { min-width: 0; font-size: 6.2cqw; font-weight: 900; line-height: 1; white-space: nowrap; overflow: hidden; color: #0b3f66; }
+.bc-art { position: relative; flex: none; height: 52%; border-radius: 3cqw; overflow: hidden;
+  background: radial-gradient(circle at 50% 42%, #ffffff 0%, var(--g1) 55%, var(--g2) 100%);
+  box-shadow: inset 0 0 0 0.8cqw rgba(255, 255, 255, 0.7), 0 0.6cqw 1.6cqw rgba(0, 40, 70, 0.18); }
+/* L'objet, rendu sur blanc : multiply fond le blanc dans la teinte, les coutures et les ombres restent. */
+.bc-obj { position: absolute; left: 50%; top: 50%; height: 96%; aspect-ratio: 1; mix-blend-mode: multiply; transform: translate(-50%, -50%); }
+.bc-obj img { width: 100%; height: 100%; object-fit: contain; animation: bc-bob 5s ease-in-out infinite; animation-delay: calc(var(--i) * -0.7s); }
+.bc.is-drawing .bc-obj img { animation: bc-pop 0.6s cubic-bezier(0.23, 1, 0.32, 1) both, bc-bob 5s 0.6s ease-in-out infinite; }
+.bc-foil { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color-dodge; opacity: 0; transition: opacity 0.3s;
+  background: conic-gradient(from calc(var(--ry) * 4) at var(--mx) var(--my), #ff9de0, #8ff3ff, #b7ff9e, #fff69a, #ff9de0); }
+.bc.is-argent .bc-foil { opacity: 0.18; }
+.bc.is-or .bc-foil { opacity: 0.3; }
+.bc.is-argent:hover .bc-foil, .room-stage .bc.is-argent .bc-foil { opacity: 0.4; }
+.bc.is-or:hover .bc-foil, .room-stage .bc.is-or .bc-foil { opacity: 0.55; }
+.bc-text { flex: 1; display: flex; align-items: center; justify-content: center; margin-top: 2.6cqw; padding: 2.4cqw 3.4cqw; border-radius: 2.2cqw;
+  background: color-mix(in srgb, var(--g1) 45%, #ffffff); font-size: 5.4cqw; font-weight: 700; line-height: 1.3; text-align: center; color: #1d3a52; text-wrap: balance; }
+.bc-foot { display: flex; justify-content: center; margin-top: 2.6cqw; }
+.bc-chip { display: inline-flex; align-items: stretch; border: 0.9cqw solid #0072b6; border-radius: 2cqw; overflow: hidden; font-size: 4.4cqw; font-weight: 700; color: #0072b6; }
+.bc-chip > span { display: flex; align-items: center; padding: 1.4cqw 1.8cqw; white-space: nowrap; }
+.bc-chip i { width: 4cqw; background: repeating-linear-gradient(135deg, rgba(0, 114, 182, 0.5) 0 1.5px, transparent 1.5px 3px); }
+.bc-app { gap: 1.4cqw; font-weight: 900; color: #0b4a75; }
+.bc-app img { width: 7.4cqw; height: 7.4cqw; object-fit: contain; }
+.bc-app b { background: linear-gradient(90deg, #00aeef, #00b08b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bc-shine { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.5) 48%, transparent 58%); background-size: 260% 100%; background-position: 130% 0; }
+.bc.is-new .bc-shine, .room-stage .bc-shine { animation: bc-shine 4.5s 0.8s ease-in-out infinite; }
+.bc-glare { position: absolute; inset: 0; z-index: 3; border-radius: 6.5cqw; pointer-events: none; opacity: 0; transition: opacity 0.3s; transform: translateZ(3.5px);
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, 0.55), transparent 55%); mix-blend-mode: overlay; }
+.room-row .bc:hover .bc-glare, .room-stage .bc-glare { opacity: 1; }
+
+/* Le verso : la fin de la vidéo, blanc, le logo, le nom de l'outil, puis Ayming et Acciline+. */
+.bc-back {
+  transform: rotateY(180deg) translateZ(3px); display: flex; flex-direction: column; align-items: center; padding: 8cqw 8cqw 7cqw;
+  background: #ffffff; box-shadow: inset 0 0 0 1.6cqw #ffffff, inset 0 0 0 2cqw #e3e9ef, 0 10px 26px rgba(0, 0, 0, 0.35); color: #0b4a75;
+}
+.bc-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3cqw; }
+.bc-medal { display: grid; place-items: center; width: 46cqw; height: 46cqw; }
+.bc-medal img { width: 100%; filter: drop-shadow(0 1.2cqw 1.6cqw rgba(0, 40, 70, 0.25)); }
+.bc.is-unwon .bc-medal img { opacity: 0.5; filter: grayscale(0.7); }
+.bc-q { font-size: 30cqw; font-weight: 900; line-height: 1; background: linear-gradient(135deg, #00aeef, #00b08b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bc-bname { font-size: 7.6cqw; font-weight: 900; line-height: 1.1; color: #0b4a75; white-space: nowrap; }
+.bc-bname span { background: linear-gradient(90deg, #00aeef, #00b08b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bc-lock { display: inline-flex; align-items: center; gap: 2.4cqw; padding: 2cqw 4cqw; border-radius: 99px; background: #eaf6fc; color: #0b4a75; font-size: 5cqw; font-weight: 700; }
+.bc-lock svg { width: 5.4cqw; height: 5.4cqw; }
+.bc-todo { font-size: 5cqw; font-weight: 700; line-height: 1.35; text-align: center; color: #4a5b6b; text-wrap: balance; }
+.bc-by { display: flex; justify-content: center; }
+.bc-logos { display: flex; align-items: center; gap: 3cqw; }
+.bc-logos img { height: 6.4cqw; width: auto; }
+.bc-logos i { width: 0.3cqw; height: 7cqw; background: #d6dde4; }
+.bc-logos .bc-acc { height: 5.2cqw; }
+
+/* La nouvelle carte : son ruban, ses étincelles ; l'or scintille doucement. */
+.bc-new { position: absolute; z-index: 4; top: -9px; left: 50%; transform: translateX(-50%) translateZ(30px); padding: 4px 10px; border-radius: 99px;
+  background: linear-gradient(90deg, #00aeef, #00b08b); color: #fff; font-size: 0.6875rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 4px 14px rgba(0, 174, 239, 0.5); opacity: 0; pointer-events: none; }
+.bc.is-new .bc-new { opacity: 1; transition: opacity 0.3s 0.4s; }
+.bc-spark { position: absolute; z-index: 5; left: 50%; top: 45%; width: 8px; height: 8px; margin: -4px; border-radius: 50%; pointer-events: none; opacity: 0;
+  background: var(--c); box-shadow: 0 0 10px var(--c); }
+.bc-spark.go { animation: bc-spark 0.9s cubic-bezier(0.23, 1, 0.32, 1) both; }
+.bc-twinkle { position: absolute; z-index: 4; width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px 2px #ffe58a; pointer-events: none; animation: bc-twinkle 2.4s ease-in-out infinite; }
+.bc.is-locked .bc-twinkle { display: none; }
+.bc.deal { animation: bc-deal 0.7s cubic-bezier(0.23, 1, 0.32, 1) both; animation-delay: calc(var(--i) * 55ms); }
+
+@keyframes bc-bob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-3.5%) rotate(1.5deg); } }
+@keyframes bc-pop { 0% { transform: scale(0.6); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes bc-shine { 0% { background-position: 130% 0; } 40%, 100% { background-position: -30% 0; } }
+@keyframes bc-deal { from { transform: translate3d(0, 90px, -260px) rotateX(55deg) rotateZ(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes bc-spark { 0% { transform: rotate(var(--a)) translateY(0) scale(0.3); opacity: 1; } 100% { transform: rotate(var(--a)) translateY(var(--r)) scale(1); opacity: 0; } }
+@keyframes bc-twinkle { 0%, 100% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes bc-float { 0%, 100% { transform: translateY(0) rotate(-0.6deg); } 50% { transform: translateY(-10px) rotate(0.6deg); } }
+
+/* ── La carte en main : elle vient de l'étagère, flotte, se tourne d'un côté sur l'autre ── */
+.room-stage[hidden] { display: none; }
+.room-stage { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+  padding: max(24px, env(safe-area-inset-top, 0px)) 16px max(24px, env(safe-area-inset-bottom, 0px));
+  background: rgba(5, 16, 26, 0.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: 0; transition: opacity 0.3s; }
+.room-stage.is-on { opacity: 1; }
+.room-stage-box { display: flex; flex-direction: column; align-items: center; gap: 22px; perspective: 2600px; max-width: 100%; }
+.room-stage .bc { width: min(320px, 74vw, calc((100dvh - 260px) * 5 / 7)); max-width: none; cursor: grab; touch-action: none; }
+.room-stage .bc-float { position: absolute; inset: 0; transform-style: preserve-3d; animation: bc-float 6s ease-in-out infinite; }
+.room-stage-txt { max-width: 34ch; text-align: center; }
+.room-stage-txt h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.room-stage-txt p { margin: 0; font-size: 0.9375rem; line-height: 1.5; color: rgba(251, 252, 253, 0.72); }
+.room-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.room-act { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 0; border-radius: 99px;
+  background: linear-gradient(90deg, #00aeef, #00b08b); color: #fff; font: inherit; font-weight: 700; font-size: 0.875rem; cursor: pointer; }
+.room-act svg { width: 18px; height: 18px; }
+.room-hint { margin: 0; font-size: 0.8125rem; color: rgba(251, 252, 253, 0.45); }
+.room-x:focus-visible, .room-act:focus-visible { outline: 2px solid #00aeef; outline-offset: 3px; }
+
+/* ── L'alerte « Carte débloquée », en haut à droite comme un trophée de console ── */
+.badge-toast {
+  position: fixed; z-index: 1000; top: max(16px, env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 12px; width: min(340px, calc(100vw - 32px)); padding: 10px 16px 10px 10px; border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(16, 44, 64, 0.94); color: #fbfcfd; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font: inherit; text-align: left; cursor: pointer;
+  pointer-events: none; transform: translateX(calc(100% + 40px)); transition: transform 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.badge-toast.is-on { pointer-events: auto; transform: none; }
+.badge-toast-thumb { flex: none; width: 48px; height: 64px; padding: 3px; border-radius: 7px; background: var(--metal); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); }
+.badge-toast-thumb span { display: block; height: 100%; border-radius: 5px; overflow: hidden; background: radial-gradient(circle at 50% 45%, #fff, var(--g1) 60%, var(--g2)); }
+.badge-toast-thumb img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.badge-toast.is-bronze { --metal: linear-gradient(135deg, #f8dcbc 0%, #c9844f 30%, #7e421e 55%, #e0a877 78%, #8a4b25 100%); }
+.badge-toast.is-argent { --metal: linear-gradient(135deg, #ffffff 0%, #b9c3cc 28%, #7e8b97 52%, #eef2f5 76%, #8c99a5 100%); }
+.badge-toast.is-or { --metal: linear-gradient(135deg, #fff6c9 0%, #f2c94c 26%, #a8760c 52%, #ffe58a 74%, #b8860b 100%); }
+.badge-toast-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.badge-toast-k { font-size: 0.75rem; font-weight: 700; color: #00aeef; }
+.badge-toast-txt strong { font-size: 0.9375rem; line-height: 1.25; }
+.badge-toast-txt small { font-size: 0.75rem; color: rgba(251, 252, 253, 0.55); }
+.badge-toast.is-on .badge-toast-thumb { animation: bc-pop 0.6s 0.25s cubic-bezier(0.23, 1, 0.32, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bc.deal, .bc.is-platine .bc-front, .bc.is-platine .bc-shine, .bc-obj img, .room-stage .bc-float, .bc.is-new .bc-shine, .room-stage .bc-shine, .bc-spark.go, .bc-twinkle, .badge-toast.is-on .badge-toast-thumb { animation: none !important; }
+  .bc-in { transition: none; }
+  .badge-toast { transition: opacity 0.2s; transform: none; opacity: 0; }
+  .badge-toast.is-on { opacity: 1; }
+}
+
+/* ── La carte du héros : platine, liseré d'or, sous pochette, seule sur l'étagère du haut ── */
+.room-dot.is-platine { background: linear-gradient(145deg, #ffffff, #c9d6e3 45%, #e8d9ff 70%, #9aa9b8); }
+.bc-art-q { position: absolute; inset: 0; display: grid; place-items: center; font-size: 30cqw; }
+/* Le platine se distingue de l'or au premier regard : une carte au dégradé bleu Ayming, un cadre holographique qui
+   change de reflet, un bandeau argent, un filet d'or et un éclat qui passe sans arrêt. */
+.bc.is-platine { --metal: linear-gradient(120deg, #f4f7fb 0%, #c9f1ff 14%, #e9dcff 28%, #fff3c4 42%, #c6ffe9 56%, #ffd9f1 70%, #d3e4ff 84%, #f4f7fb 100%); }
+.bc.is-platine .bc-front { background-size: 300% 300%; animation: bc-holo 7s linear infinite; }
+.bc.is-platine .bc-front-in { background: linear-gradient(160deg, #004A76 0%, #0B5E92 45%, #278FC9 100%); color: #f3f7fb;
+  box-shadow: inset 0 0 0 0.7cqw #e2b13c, inset 0 0 0 1.3cqw rgba(255, 233, 160, 0.25); }
+.bc.is-platine .bc-title { border-color: #e9eef4; background: linear-gradient(180deg, #ffffff 0%, #dfe6ee 55%, #b9c6d3 100%); }
+.bc.is-platine .bc-name { color: #0b2a47; }
+.bc.is-platine .bc-art { box-shadow: inset 0 0 0 0.8cqw rgba(255, 255, 255, 0.5), 0 0 3cqw rgba(140, 200, 255, 0.35); }
+.bc.is-platine .bc-text { background: rgba(255, 255, 255, 0.08); color: #f3f7fb; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); }
+.bc.is-platine .bc-chip { border-color: #cfe0ee; color: #e6f2fb; }
+.bc.is-platine .bc-chip i { background: repeating-linear-gradient(135deg, rgba(230, 242, 251, 0.6) 0 1.5px, transparent 1.5px 3px); }
+.bc.is-platine .bc-app { color: #ffffff; }
+.bc.is-platine .bc-app b { background: linear-gradient(90deg, #7fd3f5, #6fe3c0); -webkit-background-clip: text; background-clip: text; }
+.bc.is-platine .bc-foil { opacity: 0.05; }
+.bc.is-platine:hover .bc-foil, .room-stage .bc.is-platine .bc-foil { opacity: 0.08; }
+.bc.is-platine:not(.is-locked) .bc-shine { animation: bc-shine 4.5s 0.8s ease-in-out infinite; }
+@keyframes bc-holo { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.bc.is-platine .bc-twinkle { box-shadow: 0 0 8px 2px #e6fbff; }
+/* La pochette : un plastique transparent un peu plus grand que la carte, son reflet et sa soudure en haut. */
+.bc-sleeve { position: absolute; inset: -2.6cqw; z-index: 4; border-radius: 8cqw; pointer-events: none; transform: translateZ(6px);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.04) 30%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.22) 78%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: inset 0 0 0 1px rgba(150, 170, 190, 0.35), inset 0 3.2cqw 0 -2.4cqw rgba(255, 255, 255, 0.6), 0 0 0 1px rgba(0, 40, 70, 0.08); }
+.bc.is-hero .bc-shadow { background: rgba(170, 120, 10, 0.35); }
+
+.room-shelf h3 .room-dot { align-self: center; }

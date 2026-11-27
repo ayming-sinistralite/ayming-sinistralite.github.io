@@ -1,0 +1,187 @@
+/* ── Visite guidée (Driver.js). Les règles de structure viennent de driver.css. La bulle suit
+      Microsoft 365 : la maquette de l'outil en tête (js/mockup.js), puis un corps à la couleur
+      de la marque, texte blanc, « Suivant » en blanc plein. ── */
+.driver-popover.tour-popover {
+  --tour-bg: var(--accent); --tour-fg: var(--on-accent);
+  --tour-head: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+  background: var(--tour-bg); color: var(--tour-fg);
+  border: none; border-radius: 14px; overflow: hidden;
+  padding: 0; width: min(340px, calc(100vw - 2 * var(--space-4))); max-width: none;
+  font-family: var(--sans); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+.tour-mock { position: relative; height: 150px; background: var(--tour-head); overflow: hidden; }
+/* La fenêtre est plus haute que l'en-tête : on en voit le haut, ou le bas quand l'arrêt parle de
+   ce qui s'y trouve (Virginie, les ressources). */
+.tour-mock .mk-window { position: absolute; left: 18px; right: 18px; top: 16px; height: 214px; }
+.tour-mock.is-bottom .mk-window { top: auto; bottom: 16px; }
+.tour-popover .driver-popover-title {
+  padding: var(--space-4) var(--space-5) 0; font-family: var(--sans); font-size: 1.125rem; font-weight: var(--weight-black);
+  color: var(--tour-fg); line-height: var(--leading-tight);
+}
+.tour-popover .driver-popover-description {
+  padding: 0 var(--space-5); font-family: var(--sans); font-size: var(--text-sm); line-height: var(--leading-normal);
+  color: color-mix(in srgb, var(--tour-fg) 88%, transparent); margin-top: var(--space-2);
+}
+.tour-popover .driver-popover-progress-text { font-size: var(--text-sm); color: var(--tour-fg); }
+.tour-popover .driver-popover-footer button {
+  font-family: var(--sans); font-size: var(--text-sm); font-weight: var(--weight-bold);
+  min-height: 38px; padding: 0 var(--space-4); border-radius: var(--radius-full);
+  border: 1px solid color-mix(in srgb, var(--tour-fg) 70%, transparent); background: transparent; color: var(--tour-fg);
+  text-shadow: none; cursor: pointer;
+}
+.tour-popover .driver-popover-footer button.driver-popover-next-btn {
+  background: var(--tour-fg); border-color: var(--tour-fg); color: var(--tour-bg);
+}
+.tour-popover .driver-popover-footer button:focus-visible,
+.tour-popover .driver-popover-close-btn:focus-visible { outline: 2px solid var(--tour-fg); outline-offset: 2px; }
+.tour-popover .driver-popover-close-btn {
+  top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; z-index: 2;
+  background: var(--bg-elevated); color: var(--text); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.tour-popover .driver-popover-close-btn:hover { color: var(--accent); }
+/* La flèche prend la couleur du côté qu'elle touche : la maquette en haut, le corps en bas. */
+.driver-popover.tour-popover .driver-popover-arrow-side-top.driver-popover-arrow { border-top-color: var(--tour-bg); }
+.driver-popover.tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow { border-bottom-color: var(--tour-head); }
+.driver-popover.tour-popover .driver-popover-arrow-side-left.driver-popover-arrow { border-left-color: var(--tour-head); }
+.driver-popover.tour-popover .driver-popover-arrow-side-right.driver-popover-arrow { border-right-color: var(--tour-head); }
+
+/* Driver écrit son titre dans un <header> et ses boutons dans un <footer>, que base.css habille
+   en bandeaux pleine largeur. On les ramène à de simples conteneurs. */
+.tour-popover header,
+.tour-popover footer {
+  padding: 0; margin: 0; background: none; border: 0;
+  font-size: inherit; color: inherit; width: auto;
+}
+.tour-popover footer { margin-top: var(--space-4); padding: 0 var(--space-5) var(--space-5); }
+
+/* Message d'accueil (tour.js), un <dialog> natif sur le modèle de Microsoft 365 : le badge
+   « Bonjour, je m'appelle » à gauche, la question à droite, une flèche au bord et trois points.
+   Deux questions (prénom, secteur) puis l'accueil, chacune passable. */
+.welcome {
+  /* La remise à zéro des marges de base.css décentre un <dialog>, d'où margin: auto. */
+  margin: auto; inset: 0;
+  width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: none;
+  width: min(860px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: none;
+  border-radius: var(--radius-lg); background: var(--bg-elevated); color: var(--text); overflow: auto;
+  box-shadow: var(--shadow-modal);
+}
+.welcome[open] { display: flex; flex-direction: column; }
+.welcome[open] > * { flex-shrink: 0; }
+.welcome::backdrop { background: rgba(10, 24, 36, 0.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.welcome-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 0; }
+.welcome-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-secondary); }
+.welcome-brand img { height: 28px; width: 28px; }
+.welcome-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: center; gap: 40px;
+  min-height: 320px; padding: 16px 88px 8px 40px;
+}
+.welcome-art { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+#welcomeTag { display: flex; justify-content: center; width: 100%; }
+.welcome-main { min-width: 0; }
+.welcome-step[hidden] { display: none; }
+.welcome-eyebrow { margin: 0 0 10px; min-height: 1.4em; font-size: var(--text-base); font-weight: 700; color: var(--text); }
+.welcome-q { margin: 0 0 12px; font-size: 1.6rem; font-weight: 900; line-height: 1.2; color: var(--text); }
+.welcome-why { margin: 0 0 24px; font-size: 1.0625rem; color: var(--text-secondary); }
+.welcome-lead { margin: 0 0 20px; font-size: 1.0625rem; line-height: 1.5; color: var(--text-secondary); }
+.welcome-input {
+  width: 100%; min-height: 52px; padding: 0 16px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-elevated); color: var(--text); font: inherit; font-size: 1.125rem;
+}
+.welcome-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+.welcome-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.welcome-features li { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.welcome-features strong { font-size: var(--text-sm); color: var(--text); }
+.welcome-ico {
+  display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);
+}
+.welcome-ico svg { width: 22px; height: 22px; }
+.welcome-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 22px; }
+.welcome-btn {
+  min-height: 48px; padding: 0 24px; border-radius: var(--radius-full); font: inherit; font-size: var(--text-base); font-weight: 700;
+  cursor: pointer; transition: transform var(--dur-press) var(--ease-out), background 0.15s;
+}
+.welcome-btn:active { transform: scale(0.97); }
+.welcome-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.welcome-btn-text { background: transparent; border: none; color: var(--text-secondary); }
+.welcome-btn-text:hover { color: var(--accent); }
+.welcome-btn-primary { order: -1; background: var(--accent); color: var(--bg-elevated); border: 1px solid var(--accent); }
+.welcome-btn-primary:hover { filter: brightness(1.08); }
+.welcome-btn-primary:disabled { opacity: 0.45; cursor: default; filter: none; transform: none; }
+.welcome-dots { display: flex; justify-content: center; gap: 10px; padding: 8px 0 20px; }
+.welcome-dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.2s; }
+.welcome-dots span.on { background: var(--accent); }
+
+/* Le badge « Bonjour, je m'appelle » : un autocollant, couleurs fixes en clair comme en sombre,
+   comme l'image qu'on télécharge (tour.js le dessine aussi sur un canvas). */
+.name-tag {
+  width: 300px; max-width: 100%; margin: 0; border-radius: 18px; overflow: hidden; background: #fff;
+  box-shadow: 0 18px 40px rgba(0, 74, 118, 0.22); transform: rotate(-3deg);
+  transition: transform 0.3s var(--ease-out);
+}
+.name-tag-top {
+  display: flex; flex-direction: column; align-items: center; padding: 18px 16px 14px; color: #fff;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(0, 176, 139, 0.55), transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(0, 174, 239, 0.6), transparent 55%),
+    linear-gradient(135deg, #004A76 0%, #0072B6 100%);
+}
+.name-tag-hello { font-size: 2rem; font-weight: 900; letter-spacing: 0.06em; line-height: 1; text-transform: uppercase; }
+.name-tag-sub { margin-top: 4px; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.name-tag-body {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 120px; padding: 16px 18px; text-align: center;
+}
+.name-tag-name { display: inline-block; font-size: 2.2rem; font-weight: 900; line-height: 1.1; color: #004A76; overflow-wrap: anywhere; }
+.name-tag.is-filled { transform: rotate(-1deg); }
+.name-tag-name.pop { animation: name-pop 0.25s var(--ease-out); }
+@keyframes name-pop { 0% { transform: scale(0.94); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .name-tag, .name-tag.is-filled { transform: none; transition: none; }
+  .name-tag-name.pop { animation: none; }
+}
+.name-tag-name:empty::before { content: ''; display: block; width: 180px; height: 2px; margin: 24px auto 0; background: #d5dee6; }
+.name-tag-sector { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; font-weight: 400; line-height: 1.35; color: #4a5b6b; }
+.name-tag-sector[hidden] { display: none; }
+.name-tag-sector small { font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #8a98a6; }
+.name-tag-foot {
+  display: flex; justify-content: space-between; padding: 10px 18px; font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: linear-gradient(90deg, var(--brand) 0%, var(--brand-green) 100%);
+}
+.welcome-unlock { display: flex; align-items: center; gap: 8px; margin: 18px 0 0; font-size: var(--text-sm); color: var(--text-secondary); }
+.welcome-unlock svg { width: 16px; height: 16px; color: #F29100; }
+@media (max-width: 768px) {
+  .welcome-head { padding: 16px 16px 0; }
+  .welcome-grid { grid-template-columns: 1fr; gap: 20px; min-height: 0; padding: 16px 20px 8px; }
+  .name-tag { width: min(260px, 100%); }
+  .name-tag-hello { font-size: 1.7rem; }
+  .name-tag-body { min-height: 96px; padding: 12px 16px; }
+  .name-tag-name { font-size: 1.9rem; }
+  .name-tag-foot { padding: 8px 12px; font-size: var(--text-xs); white-space: nowrap; }
+  .welcome-q { font-size: 1.4rem; }
+  .welcome-features { grid-template-columns: 1fr; gap: 8px; }
+  .welcome-features li { flex-direction: row; text-align: left; }
+  .welcome-ico { width: 40px; height: 40px; }
+  .welcome-actions { flex-direction: column; align-items: stretch; }
+  .welcome-btn { width: 100%; }
+}
+.welcome-help { margin-top: 8px; }
+.welcome-help svg { color: var(--accent); }
+
+/* Écran tactile : boutons et croix de la visite à la cible minimale, sans changer le dessin sur ordinateur. */
+@media (hover: none) {
+  .tour-popover .driver-popover-footer button { min-height: var(--tap-min); min-width: var(--tap-min); }
+  .tour-popover .driver-popover-close-btn { width: var(--tap-min); height: var(--tap-min); top: 4px; right: 4px; }
+}
+
+/* L'inscription : prénom et e-mail, l'accord facultatif et la ligne sur les données. */
+.welcome-form { display: flex; flex-direction: column; }
+.welcome-label { margin: 0 0 6px; font-size: 0.8125rem; font-weight: 700; color: var(--heading); }
+.welcome-form .welcome-input + .welcome-label { margin-top: 14px; }
+.welcome-err { min-height: 1.4em; margin: 8px 0 0; font-size: 0.8125rem; color: var(--danger-text); }
+.welcome-err:empty { visibility: hidden; }
+.welcome-consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 6px; font-size: 0.8125rem; line-height: 1.45; color: var(--text-secondary); cursor: pointer; }
+.welcome-consent input { flex: none; width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent); }
+.welcome-privacy { margin: 10px 0 0; font-size: 0.75rem; color: var(--text-dim); }
+.welcome-privacy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.welcome .diag-trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

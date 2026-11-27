@@ -1,0 +1,260 @@
+/* ── La fenêtre « Partager » (js/share.js), celle du rapport comme celle d'une page secteur ──
+   Un <dialog> natif : un titre, une phrase, puis les applications en ronds. Centrée sur ordinateur,
+   elle devient sur téléphone une feuille posée en bas, dont la rangée d'applications défile de côté. */
+.share-sheet {
+  /* La remise à zéro des marges de base.css décentre un <dialog>, d'où margin: auto. */
+  margin: auto; inset: 0; position: fixed;
+  width: min(580px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 28px 32px 24px; border: none;
+  border-radius: var(--radius-lg); background: var(--bg-elevated); color: var(--text); overflow: auto;
+  box-shadow: var(--shadow-modal);
+}
+.share-sheet::backdrop { background: rgba(10, 24, 36, 0.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.share-sheet .welcome-x { position: absolute; top: 14px; right: 14px; }
+.share-sheet h2 { margin: 0 40px 6px 0; font-size: 1.5rem; font-weight: 900; color: var(--text); }
+.share-sheet-lead { margin: 0 0 22px; color: var(--text-secondary); line-height: 1.5; }
+.share-sheet-apps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 6px; }
+.share-app {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 4px 0;
+  border: none; background: transparent; color: var(--text); font: inherit; cursor: pointer;
+}
+.share-app-icon {
+  width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); color: var(--text); border: 1px solid var(--border); box-sizing: border-box;
+  transition: transform 0.15s ease;
+}
+.share-app:hover .share-app-icon { transform: scale(1.06); }
+.share-app:focus-visible { outline: none; }
+.share-app:focus-visible .share-app-icon { outline: 2px solid var(--accent); outline-offset: 3px; }
+.share-app-icon svg { width: 26px; height: 26px; }
+.share-app-label { max-width: 100%; font-size: var(--text-sm); text-align: center; line-height: 1.25; }
+/* Les couleurs des marques sont celles des marques, pas de la palette Ayming. */
+.share-app-email .share-app-icon { background: var(--accent); border-color: var(--accent); color: var(--bg-elevated); }
+.share-app-whatsapp .share-app-icon { background: #25D366; border-color: #25D366; color: #fff; }
+.share-app-whatsapp svg { width: 30px; height: 30px; }
+.share-app-linkedin .share-app-icon { background: #0A66C2; border-color: #0A66C2; }
+.share-app-teams .share-app-icon { background: #5B5FC7; border-color: #5B5FC7; }
+.share-app-linkedin svg { width: 26px; height: 26px; }
+.share-app-teams svg { width: 30px; height: 30px; }
+.share-app-sms .share-app-icon { background: #34C759; border-color: #34C759; color: #fff; }
+.share-app-x .share-app-icon, .share-app-threads .share-app-icon { background: #000; border-color: #000; color: #fff; }
+.share-app-x svg { width: 22px; height: 22px; }
+[data-theme="dark"] .share-app-x .share-app-icon, [data-theme="dark"] .share-app-threads .share-app-icon { border-color: var(--border); }
+/* Telegram et Facebook sont des ronds pleins : le logo remplit la pastille. */
+.share-app-telegram .share-app-icon { background: #fff; border: none; color: #26A5E4; }
+.share-app-facebook .share-app-icon { background: #fff; border: none; color: #0866FF; }
+.share-app-telegram svg, .share-app-facebook svg { width: 56px; height: 56px; }
+/* Reddit en rond plein comme Telegram. */
+.share-app-reddit .share-app-icon { background: #fff; border: none; color: #FF4500; }
+.share-app-reddit svg { width: 56px; height: 56px; }
+.share-app-bluesky .share-app-icon { background: #1185FE; border-color: #1185FE; color: #fff; }
+/* Le partage d'une carte de « Mes badges » : le geste animé, deux étapes, puis le seul bouton. */
+.share-steps-box[hidden] { display: none; }
+.share-steps-box { display: flex; flex-direction: column; gap: 14px; }
+.share-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.share-steps li { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: 6px 14px; padding: 8px 10px; border-radius: 10px; line-height: 1.45; }
+.share-steps b {
+  width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; box-sizing: border-box;
+  background: var(--bg); border: 1px solid var(--border); font-size: var(--text-sm); color: var(--text);
+}
+.share-steps li.is-done b { background: var(--accent); border-color: var(--accent); color: var(--bg-elevated); }
+.share-steps a { color: var(--accent); }
+/* Le lien vers LinkedIn, dans l'étape 2, au bleu de la marque avec son « in ». */
+.share-steps .share-li-link { color: #0A66C2; font-weight: 700; text-underline-offset: 3px; white-space: nowrap; }
+[data-theme="dark"] .share-steps .share-li-link { color: #70B5F9; }
+
+/* L'animation du geste, une boucle de 9 s : le post au centre, l'icône photo, la fenêtre de fichiers de l'ordinateur,
+   la carte choisie, Publier. Une fenêtre esquissée, pas copiée, en couleurs fixes comme les marques plus haut : elle
+   reste claire en mode sombre. Le dessin tient dans une boîte de 492 px centrée. */
+.lia { position: relative; overflow: hidden; height: 320px; border-radius: var(--radius-md); background: #f3f6f9; border: 1px solid #e3e9ef; }
+.lia-in { position: absolute; left: 50%; top: 0; width: 492px; height: 100%; margin-left: -246px; }
+.lia-a { animation-duration: 18s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+.lia-bar { position: absolute; left: -200px; top: 0; right: -200px; height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 210px; box-sizing: border-box; background: #e8edf2; border-bottom: 1px solid #dde4ea; }
+.lia-bar i { width: 8px; height: 8px; border-radius: 50%; background: #c4ced8; }
+.lia-url { flex: 1; height: 18px; margin-left: 10px; padding-left: 10px; border-radius: 9px; background: #fff; font-size: 9px; color: #4a5b68; display: flex; align-items: center; }
+.lia-url { position: relative; }
+.lia-url > span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+.lia-u1 { animation-name: lia-u1; }
+.lia-u2 { opacity: 0; animation-name: lia-u2; }
+.lia-dl { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: #4a5b68; animation-name: lia-dl; }
+.lia-dl svg { width: 12px; height: 12px; }
+.lia-dlpop { position: absolute; right: 4px; top: 34px; z-index: 2; width: 196px; display: flex; align-items: center; gap: 8px; padding: 8px; box-sizing: border-box; border-radius: 8px; background: #fff; border: 1px solid #dde4ea; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); opacity: 0; animation-name: lia-dlpop; }
+.lia-dlpop img { flex: none; width: 54px; height: 28px; border-radius: 3px; }
+.lia-dlpop span { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 7.5px; color: #1d6b3a; }
+.lia-dlpop b { color: #0f172a; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lia-app { position: absolute; left: 116px; top: 82px; width: 260px; height: 120px; box-sizing: border-box; padding: 16px; border-radius: 12px; background: #fff; border: 1px solid #e3e9ef; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08); animation-name: lia-app; }
+.lia-app b { display: block; margin-bottom: 10px; font-size: 11px; color: #0f172a; }
+.lia-app-l { display: block; height: 6px; margin-bottom: 6px; border-radius: 3px; background: #e3e9ef; }
+.lia-app p { margin: 14px 0 0; font-size: 9.5px; color: #0f172a; }
+.lia-app u { color: #0A66C2; font-weight: 700; text-underline-offset: 2px; border-radius: 3px; animation: lia-app-u 18s ease-in-out infinite; }
+.lia-react { position: absolute; left: 14px; top: 192px; display: flex; align-items: center; font-size: 8px; color: #5f6b76; opacity: 0; animation-name: lia-react; }
+.lia-react i { width: 13px; height: 13px; margin-right: -4px; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: 0 0 0 1px #fff; font-style: normal; font-size: 8px; line-height: 1; }
+.lia-react span { margin-left: 8px; }
+.lia-bub { position: absolute; left: 236px; top: 206px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18); font-size: 13px; line-height: 1; opacity: 0; animation-name: lia-bub; }
+.lia-post { position: absolute; left: 117px; top: 44px; width: 258px; height: 260px; box-sizing: border-box; border-radius: 12px; background: #fff; border: 1px solid #e3e9ef; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08); animation-name: lia-post; }
+.lia-av { position: absolute; left: 14px; top: 14px; width: 28px; height: 28px; border-radius: 50%; background: #cfd8e1; }
+.lia-l1 { position: absolute; left: 50px; top: 17px; width: 100px; height: 8px; border-radius: 4px; background: #cfd8e1; }
+.lia-l2 { position: absolute; left: 50px; top: 31px; width: 62px; height: 6px; border-radius: 3px; background: #e3e9ef; }
+.lia-txt { position: absolute; left: 14px; top: 48px; width: 230px; margin: 0; font-size: 9.5px; line-height: 1.4; color: #0f172a; }
+.lia-txt b { font-weight: 400; color: #0A66C2; }
+.lia-slot { position: absolute; left: 14px; top: 80px; width: 228px; height: 112px; box-sizing: border-box; border-radius: 8px; border: 1.5px dashed #d5dee7; }
+.lia-sep { position: absolute; left: 0; right: 0; top: 206px; border-top: 1px solid #eef2f6; }
+.lia-ic { position: absolute; top: 214px; width: 32px; height: 32px; display: grid; place-items: center; color: #4a5b68; opacity: 0.5; }
+.lia-ic svg { width: 18px; height: 18px; }
+.lia-photo { position: absolute; left: 42px; top: 214px; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: #4a5b68; animation-name: lia-photo; }
+.lia-photo svg { width: 18px; height: 18px; }
+.lia-pub { position: absolute; right: 14px; top: 216px; width: 74px; height: 28px; }
+.lia-go, .lia-done { position: absolute; inset: 0; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+.lia-go { background: #0A66C2; color: #fff; animation-name: lia-go; }
+.lia-done { background: #e7f4ec; color: #1d6b3a; opacity: 0; animation-name: lia-done; }
+/* La fenêtre de fichiers de l'ordinateur, ouverte par l'icône photo. */
+.lia-files { position: absolute; left: 66px; top: 50px; width: 360px; height: 224px; box-sizing: border-box; border-radius: 10px; background: #fff; border: 1px solid #d5dee7; box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22); opacity: 0; animation-name: lia-files; }
+.lia-files-bar { position: absolute; left: 0; right: 0; top: 0; height: 24px; display: flex; align-items: center; gap: 5px; padding: 0 10px; border-bottom: 1px solid #eef2f6; }
+.lia-files-bar i { width: 7px; height: 7px; border-radius: 50%; background: #d5dee7; }
+.lia-side { position: absolute; left: 0; top: 24px; bottom: 0; width: 88px; padding: 10px 6px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; background: #f6f8fa; border-right: 1px solid #eef2f6; border-radius: 0 0 0 10px; }
+.lia-side span { padding: 3px 6px; border-radius: 4px; font-size: 8.5px; color: #4a5b68; }
+.lia-side .is-on { background: #dbeaf5; color: #004A76; font-weight: 700; }
+.lia-file { position: absolute; top: 44px; width: 84px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 4px; border-radius: 6px; font-size: 7.5px; line-height: 1.25; color: #0f172a; text-align: center; white-space: nowrap; }
+.lia-file img, .lia-doc { width: 64px; height: 34px; border-radius: 3px; }
+.lia-doc { display: block; background: #eef2f6; border: 1px solid #dde4ea; box-sizing: border-box; }
+.lia-pick { animation-name: lia-pick; }
+.lia-open { position: absolute; right: 12px; bottom: 12px; padding: 5px 14px; border-radius: 6px; background: #0072b6; color: #fff; font-size: 9px; font-weight: 700; animation-name: lia-open; }
+.lia-fly { position: absolute; border-radius: 6px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18); opacity: 0; animation-name: lia-fly; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+.lia-cursor { position: absolute; left: 0; top: 0; width: 22px; height: 26px; transform-origin: 2px 2px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25)); animation-name: lia-cursor; animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1); }
+.lia-slot { animation-name: lia-slot; }
+.lia-tb { animation-name: lia-tb; }
+.lia-prev { position: absolute; left: 14px; top: 82px; width: 228px; height: 62px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 8px; border: 1px solid #dde4ea; background: #fff; animation-name: lia-prev; }
+.lia-prev img { flex: none; width: 88px; height: 46px; border-radius: 4px; object-fit: cover; }
+.lia-prev span { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding-right: 14px; font-size: 7.5px; line-height: 1.3; color: #5f6b76; }
+.lia-prev b { color: #0f172a; font-weight: 700; }
+.lia-prev i { position: absolute; right: 5px; top: 5px; width: 15px; height: 15px; border-radius: 50%; display: grid; place-items: center; background: #38434f; color: #fff; font-style: normal; font-size: 11px; line-height: 1; }
+.lia-cursor svg { display: block; width: 22px; height: 26px; }
+@keyframes lia-post { 0%, 22.2% { opacity: 0; transform: translateY(10px) scale(0.98); } 25.9%, 91% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes lia-prev { 0%, 22.2%, 31.4% { opacity: 1; transform: none; } 33.2%, 100% { opacity: 0; transform: scale(0.96); } }
+@keyframes lia-slot { 0%, 22.2%, 32% { opacity: 0; } 33.8%, 100% { opacity: 1; } }
+@keyframes lia-tb { 0%, 22.2%, 32% { opacity: 0; } 34.4%, 100% { opacity: 0.5; } }
+@keyframes lia-cursor {
+  0%, 9.2% { transform: translate(400px, 296px); }
+  15.8% { transform: translate(162px, 151px); } 17.1% { transform: translate(162px, 151px) scale(0.82); } 18.3%, 25.9% { transform: translate(162px, 151px); }
+  30.2% { transform: translate(345px, 136px); } 31.1% { transform: translate(345px, 136px) scale(0.82); } 32%, 33.8% { transform: translate(345px, 136px); }
+  40.6% { transform: translate(171px, 268px); } 41.8% { transform: translate(171px, 268px) scale(0.82); } 43%, 44.8% { transform: translate(171px, 268px); }
+  51.6% { transform: translate(286px, 112px); } 52.8% { transform: translate(286px, 112px) scale(0.82); } 53.4% { transform: translate(286px, 112px); }
+  57.7% { transform: translate(392px, 254px); } 58.9% { transform: translate(392px, 254px) scale(0.82); } 59.8%, 64.4% { transform: translate(392px, 254px); }
+  69.3% { transform: translate(320px, 268px); } 71.7% { transform: translate(320px, 268px) scale(0.82); }
+  72.9%, 87.3% { transform: translate(320px, 268px); opacity: 1; } 100% { transform: translate(320px, 268px); opacity: 0; }
+}
+@keyframes lia-photo { 0%, 22.2%, 32% { opacity: 0; background: transparent; } 34.4%, 40.6% { opacity: 1; background: transparent; } 41.8%, 43.6% { background: #dbeaf5; } 46.1%, 100% { background: transparent; } }
+@keyframes lia-files { 0%, 22.2%, 42.4% { opacity: 0; transform: scale(0.96); } 44.6%, 59.5% { opacity: 1; transform: none; } 61%, 100% { opacity: 0; transform: scale(0.98); } }
+@keyframes lia-pick { 0%, 22.2%, 52.2% { background: transparent; } 53.1%, 100% { background: #dbeaf5; } }
+@keyframes lia-open { 0%, 22.2%, 58.2% { background: #0072b6; } 58.9%, 59.8% { background: #004A76; } 61%, 100% { background: #0072b6; } }
+@keyframes lia-fly {
+  0%, 22.2%, 59.5% { opacity: 0; left: 258px; top: 98px; width: 64px; height: 34px; }
+  60.4% { opacity: 1; left: 258px; top: 98px; width: 64px; height: 34px; }
+  66.2%, 91% { opacity: 1; left: 142px; top: 126px; width: 206px; height: 108px; }
+  100% { opacity: 0; left: 142px; top: 126px; width: 206px; height: 108px; }
+}
+@keyframes lia-go { 0%, 22.2%, 71.7% { background: #0A66C2; opacity: 1; } 72.7% { background: #004182; opacity: 1; } 73.8%, 100% { opacity: 0; } }
+@keyframes lia-done { 0%, 22.2%, 73.6% { opacity: 0; } 74.8%, 91% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes lia-u1 { 0%, 18.3% { opacity: 1; } 19.2%, 100% { opacity: 0; } }
+@keyframes lia-u2 { 0%, 18.3% { opacity: 0; } 19.2%, 100% { opacity: 1; } }
+@keyframes lia-dl { 0%, 1.7% { color: #4a5b68; background: transparent; } 3.3%, 9.2% { color: #0072b6; background: #dbeaf5; } 10.8%, 100% { color: #4a5b68; background: transparent; } }
+@keyframes lia-dlpop { 0%, 2.5% { opacity: 0; transform: translateY(-4px); } 4.2%, 9.2% { opacity: 1; transform: none; } 10.8%, 100% { opacity: 0; transform: translateY(-4px); } }
+@keyframes lia-app { 0%, 17.5% { opacity: 1; } 19.2%, 100% { opacity: 0; } }
+@keyframes lia-app-u { 0%, 16.2% { background: transparent; } 17.1%, 18.3% { background: #dbeaf5; } 19.2%, 100% { background: transparent; } }
+@keyframes lia-react { 0%, 76% { opacity: 0; transform: scale(0.6); } 78% { opacity: 1; transform: scale(1.08); } 79.5%, 91% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes lia-bub { 0%, 75% { opacity: 0; transform: translate(var(--x), 0) scale(0.4); } 77% { opacity: 1; transform: translate(var(--x), -14px) scale(1.1); } 86% { opacity: 1; transform: translate(calc(var(--x) * 1.6), -96px) scale(1); } 90%, 100% { opacity: 0; transform: translate(calc(var(--x) * 1.8), -118px) scale(0.9); } }
+@media (prefers-reduced-motion: reduce) {
+  .lia-a { animation: none; }
+  .lia-cursor, .lia-files, .lia-done, .lia-bub, .lia-react, .lia-prev, .lia-dlpop, .lia-app, .lia-u1 { opacity: 0; }
+  .lia-u2 { opacity: 1; }
+  .lia-app u { animation: none; }
+  .lia-tb { opacity: 0.5; }
+  .lia-fly { opacity: 1; left: 142px; top: 126px; width: 206px; height: 108px; }
+}
+.share-sheet-status { min-height: 1.4em; margin: 14px 0 0; font-size: var(--text-sm); color: var(--text-secondary); text-align: center; }
+
+@media (max-width: 640px) {
+  .share-sheet {
+    margin: auto 0 0; width: 100%; max-width: 100%; max-height: 85dvh;
+    padding: 22px 0 calc(18px + env(safe-area-inset-bottom)); border-radius: 22px 22px 0 0;
+  }
+  .share-sheet h2, .share-sheet-lead, .share-sheet-status, .share-steps-box { padding: 0 20px; }
+  .share-sheet h2 { font-size: 1.3rem; margin-right: 56px; }
+  .share-sheet-lead { margin-bottom: 18px; }
+  /* Une rangée qui défile de côté, comme le menu de partage d'un téléphone. */
+  .share-sheet-apps {
+    display: flex; gap: 0; overflow-x: auto; padding: 0 20px; scroll-padding-inline: 20px; scroll-snap-type: x proximity;
+    scrollbar-width: none; overscroll-behavior-x: contain;
+  }
+  .share-sheet-apps::-webkit-scrollbar { display: none; }
+  /* 84 px par application : la cinquième est coupée au bord d'un écran de 390 px, signe qu'on peut faire défiler. */
+  .share-app { flex: none; width: 84px; scroll-snap-align: start; }
+}
+
+/* Le bouton de fermeture des dialogues, aussi celui de l'accueil (styles/tour.css, chargé à la demande). */
+.welcome-x {
+  width: 36px; height: 36px; border: none; border-radius: 50%;
+  background: transparent; color: var(--text-secondary); font-size: 24px; line-height: 1; cursor: pointer;
+}
+.welcome-x:hover { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.welcome-x:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* « Proposer une idée » (js/idea.js) : le cadre de la fenêtre de partage, en trois bandes (tête, champs,
+   pied sur un filet), l'identité reprise de l'accueil dans un encart gris. */
+.idea-sheet { width: min(540px, calc(100vw - 32px)); padding: 0; }
+.idea-sheet .welcome-x { top: 16px; right: 16px; }
+.idea-head { padding: 24px 28px 4px; }
+.idea-head h2 { padding: 0; margin: 0 44px 6px 0; font-size: 1.25rem; font-weight: 900; color: var(--heading); }
+.idea-lead { margin: 0; font-size: var(--text-sm); line-height: 1.5; color: var(--text-secondary); }
+.idea-body { padding: 16px 28px 20px; }
+.idea-label { display: block; margin: 14px 0 6px; font-size: 0.8125rem; font-weight: 700; color: var(--heading); }
+.idea-body > .idea-label:first-child { margin-top: 0; }
+.idea-opt { margin-left: 4px; font-weight: 400; color: var(--text-secondary); }
+.consult-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.idea-body > .consult-row:first-child .idea-label { margin-top: 0; }
+.consult-optin { display: flex; align-items: flex-start; gap: 8px; margin-top: 14px; font-size: 0.8125rem; line-height: 1.4; color: var(--text-secondary); cursor: pointer; }
+.consult-optin input { flex: none; width: 16px; height: 16px; margin: 1px 0 0; accent-color: var(--accent); }
+@media (max-width: 520px) { .consult-row { grid-template-columns: 1fr; } }
+.idea-input {
+  width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-elevated); color: var(--text); font: inherit; font-size: var(--text-sm); box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.idea-input::placeholder { color: var(--text-secondary); opacity: 0.8; }
+.idea-text { display: block; min-height: 96px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.idea-input:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+.idea-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.idea-who {
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 0 12px; margin-top: 16px; padding: 2px 14px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg);
+}
+.idea-who[hidden] { display: none; }
+.idea-err { margin: 12px 0 0; font-size: 0.8125rem; color: var(--danger-text); }
+.idea-err:empty { display: none; }
+.idea-foot {
+  display: flex; align-items: center; gap: 20px; padding: 16px 28px 20px; border-top: 1px solid var(--border);
+}
+.idea-privacy { flex: 1; margin: 0; font-size: var(--text-xs); line-height: 1.45; color: var(--text-secondary); }
+.idea-privacy a { color: inherit; }
+.idea-btn {
+  flex: none; min-height: 42px; padding: 0 20px; border: 1px solid var(--accent); border-radius: var(--radius-full);
+  background: var(--accent); color: var(--bg-elevated); font: inherit; font-size: var(--text-sm); font-weight: 700; cursor: pointer;
+  transition: transform var(--dur-press, 0.1s) ease-out, filter 0.15s ease;
+}
+.idea-btn:hover { filter: brightness(1.08); }
+.idea-btn:active { transform: scale(0.97); }
+.idea-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.idea-btn:disabled { opacity: 0.5; cursor: default; filter: none; transform: none; }
+.idea-done { display: flex; flex-direction: column; align-items: center; padding: 40px 28px 28px; text-align: center; }
+.idea-done[hidden] { display: none; }
+.idea-done-ico { display: flex; color: var(--accent); }
+.idea-done-ico svg { width: 36px; height: 36px; stroke-width: 2.25; }
+.idea-done-t { margin: 14px 0 6px; font-size: 1.25rem; font-weight: 900; color: var(--heading); }
+.idea-done .idea-lead { max-width: 34ch; margin-bottom: 24px; }
+@media (max-width: 640px) {
+  .idea-sheet { width: 100%; padding: 0 0 env(safe-area-inset-bottom); }
+  .idea-head { padding: 22px 20px 4px; }
+  .idea-body { padding: 14px 20px 18px; }
+  .idea-who { grid-template-columns: 1fr; }
+  .idea-foot { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px 20px 16px; }
+  .idea-foot .idea-btn, .idea-done .idea-btn { width: 100%; }
+}

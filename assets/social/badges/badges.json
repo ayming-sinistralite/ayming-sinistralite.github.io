@@ -1,0 +1,114 @@
+[
+ {
+  "id": "hero",
+  "name": "Héros de la sécurité",
+  "text": "La sécurité au travail, c'est mon affaire.",
+  "tier": "Platine",
+  "num": "N° 000"
+ },
+ {
+  "id": "sector",
+  "name": "Tour d'horizon",
+  "text": "J'ai situé mon secteur parmi tous les autres.",
+  "tier": "Bronze",
+  "num": "N° 001"
+ },
+ {
+  "id": "at",
+  "name": "Accidents du travail",
+  "text": "Je m'intéresse aux accidents du travail de mon secteur.",
+  "tier": "Bronze",
+  "num": "N° 002"
+ },
+ {
+  "id": "mp",
+  "name": "Maladies professionnelles",
+  "text": "Je garde un œil sur les maladies professionnelles de mon secteur.",
+  "tier": "Bronze",
+  "num": "N° 003"
+ },
+ {
+  "id": "trajet",
+  "name": "Accidents de trajet",
+  "text": "Je pense aussi aux risques du trajet.",
+  "tier": "Bronze",
+  "num": "N° 004"
+ },
+ {
+  "id": "mysector",
+  "name": "Point de repère",
+  "text": "Je sais d'où part mon entreprise.",
+  "tier": "Bronze",
+  "num": "N° 005"
+ },
+ {
+  "id": "company",
+  "name": "Premier autodiagnostic",
+  "text": "J'ai comparé mon entreprise à son secteur.",
+  "tier": "Or",
+  "num": "N° 006"
+ },
+ {
+  "id": "compare",
+  "name": "Regard croisé",
+  "text": "J'ai comparé des secteurs pour mieux comprendre le mien.",
+  "tier": "Argent",
+  "num": "N° 007"
+ },
+ {
+  "id": "rapports",
+  "name": "Collection de rapports",
+  "text": "Je suis la sinistralité de mon entreprise dans la durée.",
+  "tier": "Or",
+  "num": "N° 008"
+ },
+ {
+  "id": "name",
+  "name": "Faisons connaissance",
+  "text": "J'ai fait le premier pas.",
+  "tier": "Bronze",
+  "num": "N° 009"
+ },
+ {
+  "id": "invite",
+  "name": "Prendre soin",
+  "text": "J'invite mes pairs à suivre leur sinistralité.",
+  "tier": "Or",
+  "num": "N° 010"
+ },
+ {
+  "id": "social",
+  "name": "Porte-voix",
+  "text": "Je fais connaître la sinistralité de mon secteur.",
+  "tier": "Or",
+  "num": "N° 011"
+ },
+ {
+  "id": "virginie",
+  "name": "Nouvelle amie",
+  "text": "Je pose mes questions sur la sinistralité de mon secteur.",
+  "tier": "Argent",
+  "num": "N° 012"
+ },
+ {
+  "id": "retour",
+  "name": "De retour",
+  "text": "Je reviens faire le point.",
+  "tier": "Argent",
+  "num": "N° 013"
+ },
+ {
+  "id": "fidele",
+  "name": "Fidèle au poste",
+  "text": "Je reviens régulièrement suivre mon secteur.",
+  "tier": "Or",
+  "num": "N° 014"
+ },
+ {
+  "id": "explorateur",
+  "name": "Explorateur",
+  "text": "Je creuse les chiffres jusqu'au détail.",
+  "tier": "Platine",
+  "num": "N° 015"
+ }
+]
